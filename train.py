@@ -96,8 +96,20 @@ parser.add_argument(
     help='directory for training checkpoints'
 )
 parser.add_argument(
+    '--modelout_directory', type=str, default='models',
+    help='directory for output models'
+)
+parser.add_argument(
     '--checkpoint_prefix', type=str, default='d2',
     help='prefix for training checkpoints'
+)
+parser.add_argument(
+    '--model_type', type=str, default='vgg_trunc',
+    help='model type name'
+)
+parser.add_argument(
+    '--pretrained', type=str, default=False,
+    help='use imagenet pretrained model or not'
 )
 
 args = parser.parse_args()
@@ -115,7 +127,9 @@ if args.plot:
 # Creating CNN model
 model = D2Net(
     model_file=args.model_file,
-    use_cuda=use_cuda
+    use_cuda=use_cuda,
+    model_type=args.model_type, 
+    pretrained=args.pretrained
 )
 
 # Optimizer
@@ -274,6 +288,10 @@ for epoch_idx in range(1, args.num_epochs + 1):
             '%s.best.pth' % args.checkpoint_prefix
         )
         shutil.copy(checkpoint_path, best_checkpoint_path)
+
+# Save the trained model
+modelout_path = os.path.join(args.modelout_directory,'model_out.pth') 
+torch.save(model.state_dict(),modelout_path)
 
 # Close the log file
 log_file.close()
