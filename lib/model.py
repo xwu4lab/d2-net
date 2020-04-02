@@ -6,7 +6,8 @@ import torchvision.models as models
 
 
 class DenseFeatureExtractionModule(nn.Module):
-    def __init__(self, finetune_feature_extraction=False, use_cuda=True, model_type='vgg16_trunc', pretrained=False):
+    def __init__(self, finetune_feature_extraction=False, finetune_layers=2, use_cuda=True, 
+                 model_type='vgg16_trunc', pretrained=False):
         super(DenseFeatureExtractionModule, self).__init__()
         if model_type == 'vgg16_trunc':
             model = models.vgg16(pretrained=pretrained)
@@ -48,7 +49,7 @@ class DenseFeatureExtractionModule(nn.Module):
             param.requires_grad = False
         if finetune_feature_extraction:
             # Unlock conv4_3
-            for param in list(self.model.parameters())[-2 :]:
+            for param in list(self.model.parameters())[-finetune_layers :]:
                 param.requires_grad = True
 
         if use_cuda:
@@ -95,11 +96,13 @@ class SoftDetectionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_cuda=True, model_type='vgg16_trunc', pretrained=False):
+    def __init__(self, model_file=None, use_cuda=True, model_type='vgg16_trunc', 
+                 pretrained=False, finetune_layers=2):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(
             finetune_feature_extraction=True,
+            finetune_layers=finetune_layers,
             use_cuda=use_cuda,
             model_type = model_type,
             pretrained=pretrained

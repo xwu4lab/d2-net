@@ -108,8 +108,16 @@ parser.add_argument(
     help='model type name'
 )
 parser.add_argument(
-    '--pretrained', type=str, default=False,
+    '--pretrained', type=bool, default=False,
     help='use imagenet pretrained model or not'
+)
+parser.add_argument(
+    '--finetune_layers', type=int, default=2,
+    help='layers to be finetuned'
+)
+parser.add_argument(
+    '--scaling_steps', type=int, default=3,
+    help='scaling factor to recover the downscaled feature positions'
 )
 
 args = parser.parse_args()
@@ -129,7 +137,8 @@ model = D2Net(
     model_file=args.model_file,
     use_cuda=use_cuda,
     model_type=args.model_type, 
-    pretrained=args.pretrained
+    pretrained=args.pretrained,
+    finetune_layers=args.finetune_layers
 )
 
 # Optimizer
@@ -189,7 +198,7 @@ def process_epoch(
         batch['log_interval'] = args.log_interval
 
         try:
-            loss = loss_function(model, batch, device, plot=args.plot)
+            loss = loss_function(model, batch, device, scaling_steps=args.scaling_steps, plot=args.plot)
         except NoGradientError:
             continue
 
