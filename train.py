@@ -104,7 +104,11 @@ parser.add_argument(
     help='prefix for training checkpoints'
 )
 parser.add_argument(
-    '--truncated_blocks', type=int, default=2,
+    '--finetune_layers', type=int, default=2,
+    help='number of layers for finetuning'
+)
+parser.add_argument(
+    '--truncated_blocks', type=int, default=3,
     help='number of truncated blocks'
 )
 parser.add_argument(
@@ -128,7 +132,8 @@ if args.plot:
 model = D2Net(
     model_file=args.model_file,
     use_cuda=use_cuda,
-    param=[args.finetune_layers,args.truncated_blocks],
+    finetune_layers=args.finetune_layers,
+    truncated_blocks=args.truncated_blocks
 )
 
 # Optimizer

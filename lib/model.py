@@ -6,7 +6,7 @@ import torchvision.models as models
 
 
 class DenseFeatureExtractionModule(nn.Module):
-    def __init__(self, finetune_feature_extraction=False, use_cuda=True, param=None):
+    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2):
         super(DenseFeatureExtractionModule, self).__init__()
         
         if 0:
@@ -25,9 +25,9 @@ class DenseFeatureExtractionModule(nn.Module):
                 'pool5'
             ]
 
-            if param[1] == 3:
+            if truncated_blocks == 3:
                 conv_idx = vgg16_layers.index('conv4_3')
-            elif param[1] == 2:
+            elif truncated_blocks == 2:
                 conv_idx = vgg16_layers.index('conv5_3')
             
             self.model = nn.Sequential(
@@ -37,7 +37,7 @@ class DenseFeatureExtractionModule(nn.Module):
         else:
             model = models.resnet50(pretrained=True)
             self.model = nn.Sequential(
-                *list(model.children())[: -param[1]]
+                *list(model.children())[: -truncated_blocks]
             )
 
 
@@ -48,7 +48,7 @@ class DenseFeatureExtractionModule(nn.Module):
             param.requires_grad = False
         if finetune_feature_extraction:
             # Unlock conv4_3
-            for param in list(self.model.parameters())[-param[0] :]:
+            for param in list(self.model.parameters())[-finetune_layers :]:
                 param.requires_grad = True
 
         if use_cuda:
@@ -95,13 +95,14 @@ class SoftDetectionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_cuda=True, param=None):
+    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(
             finetune_feature_extraction=True,
             use_cuda=use_cuda,
-            param=param
+            finetune_layers=finetune_layers,
+            truncated_blocks=truncated_blocks
         )
 
         self.detection = SoftDetectionModule()
