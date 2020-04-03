@@ -137,8 +137,9 @@ elif args.model_type == 'res50':
 elif args.model_type == 'res101':
     scaling_steps = 6-args.truncated_blocks
 
-# print model name 
-print('The %s model is used for this testing' % (args.model_type))
+# print information for check
+print('The %s model is used for this testing (truncated at -%s block and finetune last %s layers) ' 
+      % (args.model_type,args.truncated_blocks,args.finetune_layers))
 
 # Creating CNN model
 model = D2Net(
