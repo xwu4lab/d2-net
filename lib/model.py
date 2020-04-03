@@ -29,13 +29,13 @@ class DenseFeatureExtractionModule(nn.Module):
                 *list(model.features.children())[: conv4_3_idx + 1]
             )
             
-        elif model_type == 'vgg16'   
+        elif model_type == 'vgg16':
             model = models.vgg16(pretrained=pretrained)
             
             self.model = nn.Sequential(
                 *list(model.features.children())[: -2]
             )
-        elif model_type == 'res50'   
+        elif model_type == 'res50':  
             model = models.res50(pretrained=pretrained)
             
             self.model = nn.Sequential(
