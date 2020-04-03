@@ -128,8 +128,7 @@ if args.plot:
 model = D2Net(
     model_file=args.model_file,
     use_cuda=use_cuda,
-    finetune_layers=args.finetune_layers,
-    truncated_blocks=args.truncated_blocks
+    param=[args.finetune_layers,args.truncated_blocks],
 )
 
 # Optimizer
