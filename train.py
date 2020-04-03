@@ -104,6 +104,10 @@ parser.add_argument(
     help='prefix for training checkpoints'
 )
 parser.add_argument(
+    '--model_type', type=str, default='vgg16',
+    help='type of pretrained model'
+)
+parser.add_argument(
     '--finetune_layers', type=int, default=2,
     help='number of layers for finetuning'
 )
@@ -133,7 +137,8 @@ model = D2Net(
     model_file=args.model_file,
     use_cuda=use_cuda,
     finetune_layers=args.finetune_layers,
-    truncated_blocks=args.truncated_blocks
+    truncated_blocks=args.truncated_blocks,
+    model_type=args.model_type
 )
 
 # Optimizer
