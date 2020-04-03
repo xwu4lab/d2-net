@@ -25,7 +25,9 @@ class DenseFeatureExtractionModule(nn.Module):
                 'pool5'
             ]
 
-            if truncated_blocks == 2:
+            if truncated_blocks == 3:
+                conv_idx = vgg16_layers.index('conv3_3')
+            elif truncated_blocks == 2:
                 conv_idx = vgg16_layers.index('conv4_3')
             elif truncated_blocks == 1:
                 conv_idx = vgg16_layers.index('conv5_3')
