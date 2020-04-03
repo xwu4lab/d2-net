@@ -9,7 +9,7 @@ class DenseFeatureExtractionModule(nn.Module):
     def __init__(self, finetune_feature_extraction=False, use_cuda=True):
         super(DenseFeatureExtractionModule, self).__init__()
         
-        if 0:
+        if 1:
             model = models.vgg16(pretrained=True)
         
             vgg16_layers = [
@@ -25,7 +25,7 @@ class DenseFeatureExtractionModule(nn.Module):
                 'pool5'
             ]
 
-            if 0:
+            if 1:
                 conv4_3_idx = vgg16_layers.index('conv4_3')
                 self.model = nn.Sequential(
                     *list(model.features.children())[: conv4_3_idx + 1]
