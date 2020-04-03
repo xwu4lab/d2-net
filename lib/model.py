@@ -6,7 +6,7 @@ import torchvision.models as models
 
 
 class DenseFeatureExtractionModule(nn.Module):
-    def __init__(self, finetune_feature_extraction=False, use_cuda=True):
+    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2):
         super(DenseFeatureExtractionModule, self).__init__()
         
         if 0:
@@ -63,7 +63,7 @@ class DenseFeatureExtractionModule(nn.Module):
             param.requires_grad = False
         if finetune_feature_extraction:
             # Unlock conv4_3
-            for param in list(self.model.parameters())[-2 :]:
+            for param in list(self.model.parameters())[-finetune_layers :]:
                 param.requires_grad = True
 
         if use_cuda:

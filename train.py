@@ -104,6 +104,10 @@ parser.add_argument(
     help='prefix for training checkpoints'
 )
 parser.add_argument(
+    '--finetune_layers', type=int, default=2,
+    help='number of layers for finetuning'
+)
+parser.add_argument(
     '--scaling_steps', type=int, default=3,
     help='scaling factor to recover the downscaled feature positions'
 )
@@ -123,7 +127,8 @@ if args.plot:
 # Creating CNN model
 model = D2Net(
     model_file=args.model_file,
-    use_cuda=use_cuda
+    use_cuda=use_cuda,
+    finetune_layers=args.finetune_layers
 )
 
 # Optimizer
