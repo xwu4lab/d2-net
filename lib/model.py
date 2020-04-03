@@ -104,7 +104,7 @@ class D2Net(nn.Module):
             finetune_feature_extraction=True,
             finetune_layers=finetune_layers,
             use_cuda=use_cuda,
-            model_type = model_type,
+            model_type=model_type,
             pretrained=pretrained
         )
 
