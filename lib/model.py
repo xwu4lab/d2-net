@@ -40,6 +40,12 @@ class DenseFeatureExtractionModule(nn.Module):
                 *list(model.children())[: -truncated_blocks-1]
             )
 
+        elif model_type == 'res101':
+            model = models.resnet101(pretrained=True)
+            self.model = nn.Sequential(
+                *list(model.children())[: -truncated_blocks-1]
+            )
+
 
         self.num_channels = 512
         

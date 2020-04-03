@@ -134,6 +134,11 @@ if args.model_type == 'vgg16':
     scaling_steps = 5-args.truncated_blocks
 elif args.model_type == 'res50':
     scaling_steps = 6-args.truncated_blocks
+elif args.model_type == 'res101':
+    scaling_steps = 6-args.truncated_blocks
+
+#
+print('The %s model is used for this testing' % (args.model_types))
 
 # Creating CNN model
 model = D2Net(
