@@ -9,7 +9,7 @@ class DenseFeatureExtractionModule(nn.Module):
     def __init__(self, finetune_feature_extraction=False, use_cuda=True):
         super(DenseFeatureExtractionModule, self).__init__()
         
-        model = models.vgg16(pretrained=pretrained)
+        model = models.vgg16(pretrained=True)
         
         vgg16_layers = [
             'conv1_1', 'relu1_1', 'conv1_2', 'relu1_2',
@@ -30,13 +30,13 @@ class DenseFeatureExtractionModule(nn.Module):
             *list(model.features.children())[: conv4_3_idx + 1]
         )
             
-        #model = models.vgg16(pretrained=pretrained)
+        #model = models.vgg16(pretrained=True)
             
         #self.model = nn.Sequential(
         #    *list(model.features.children())[: -2]
         #)
         
-        #model = models.res50(pretrained=pretrained)
+        #model = models.res50(pretrained=True)
             
         #self.model = nn.Sequential(
         #    *list(model.features.children())[: -2]
