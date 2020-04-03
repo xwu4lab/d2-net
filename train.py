@@ -115,10 +115,7 @@ parser.add_argument(
     '--truncated_blocks', type=int, default=3,
     help='number of truncated blocks'
 )
-parser.add_argument(
-    '--scaling_steps', type=int, default=3,
-    help='scaling factor to recover the downscaled feature positions'
-)
+
 
 args = parser.parse_args()
 
@@ -131,6 +128,12 @@ if args.plot:
         print('[Warning] Plotting directory already exists.')
     else:
         os.mkdir(plot_path)
+
+# calculate scaling step 
+if args.model_type == 'vgg16':
+    scaling_steps = 6-args.truncated_blocks
+elif args.model_type == 'res50':
+    scaling_steps = 7-args.truncated_blocks
 
 # Creating CNN model
 model = D2Net(
@@ -198,7 +201,7 @@ def process_epoch(
         batch['log_interval'] = args.log_interval
 
         try:
-            loss = loss_function(model, batch, device, scaling_steps=args.scaling_steps, plot=args.plot)
+            loss = loss_function(model, batch, device, scaling_steps=scaling_steps, plot=args.plot)
         except NoGradientError:
             continue
 
