@@ -182,7 +182,8 @@ def loss_function(
 
     if not has_grad:
         raise NoGradientError
-
+    
+    print(n_valid_samples)
     loss = loss / n_valid_samples
 
     return loss
