@@ -135,9 +135,6 @@ if args.plot:
 # Creating CNN model
 model = D2Net(
     model_file=args.model_file,
-    model_type=args.model_type, 
-    pretrained=args.pretrained,
-    finetune_layers=args.finetune_layers,
     use_cuda=use_cuda
 )
 

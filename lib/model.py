@@ -6,40 +6,41 @@ import torchvision.models as models
 
 
 class DenseFeatureExtractionModule(nn.Module):
-    def __init__(self, finetune_feature_extraction=False, model_type=None, pretrained=False, finetune_layers=2, use_cuda=True):
+    def __init__(self, finetune_feature_extraction=False, use_cuda=True):
         super(DenseFeatureExtractionModule, self).__init__()
-        if model_type == 'vgg16_trunc':
-            model = models.vgg16(pretrained=pretrained)
-            vgg16_layers = [
-                'conv1_1', 'relu1_1', 'conv1_2', 'relu1_2',
-                'pool1',
-                'conv2_1', 'relu2_1', 'conv2_2', 'relu2_2',
-                'pool2',
-                'conv3_1', 'relu3_1', 'conv3_2', 'relu3_2', 'conv3_3', 'relu3_3',
-                'pool3',
-                'conv4_1', 'relu4_1', 'conv4_2', 'relu4_2', 'conv4_3', 'relu4_3',
-                'pool4',
-                'conv5_1', 'relu5_1', 'conv5_2', 'relu5_2', 'conv5_3', 'relu5_3',
-                'pool5'
-            ]
-            conv4_3_idx = vgg16_layers.index('conv4_3')
+        
+        model = models.vgg16(pretrained=pretrained)
+        
+        vgg16_layers = [
+            'conv1_1', 'relu1_1', 'conv1_2', 'relu1_2',
+            'pool1',
+            'conv2_1', 'relu2_1', 'conv2_2', 'relu2_2',
+            'pool2',
+            'conv3_1', 'relu3_1', 'conv3_2', 'relu3_2', 'conv3_3', 'relu3_3',
+            'pool3',
+            'conv4_1', 'relu4_1', 'conv4_2', 'relu4_2', 'conv4_3', 'relu4_3',
+            'pool4',
+            'conv5_1', 'relu5_1', 'conv5_2', 'relu5_2', 'conv5_3', 'relu5_3',
+            'pool5'
+        ]
+        
+        conv4_3_idx = vgg16_layers.index('conv4_3')
 
-            self.model = nn.Sequential(
-                *list(model.features.children())[: conv4_3_idx + 1]
-            )
+        self.model = nn.Sequential(
+            *list(model.features.children())[: conv4_3_idx + 1]
+        )
             
-        elif model_type == 'vgg16':
-            model = models.vgg16(pretrained=pretrained)
+        #model = models.vgg16(pretrained=pretrained)
             
-            self.model = nn.Sequential(
-                *list(model.features.children())[: -2]
-            )
-        elif model_type == 'res50':  
-            model = models.res50(pretrained=pretrained)
+        #self.model = nn.Sequential(
+        #    *list(model.features.children())[: -2]
+        #)
+        
+        #model = models.res50(pretrained=pretrained)
             
-            self.model = nn.Sequential(
-                *list(model.features.children())[: -2]
-            )    
+        #self.model = nn.Sequential(
+        #    *list(model.features.children())[: -2]
+        #)    
         
         self.num_channels = 512
         
@@ -48,7 +49,7 @@ class DenseFeatureExtractionModule(nn.Module):
             param.requires_grad = False
         if finetune_feature_extraction:
             # Unlock conv4_3
-            for param in list(self.model.parameters())[-finetune_layers :]:
+            for param in list(self.model.parameters())[-2 :]:
                 param.requires_grad = True
 
         if use_cuda:
@@ -95,14 +96,11 @@ class SoftDetectionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, model_type=None, pretrained=False, finetune_layers=2, use_cuda=True):
+    def __init__(self, model_file=None, use_cuda=True):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(
             finetune_feature_extraction=True,
-            model_type=model_type,
-            pretrained=pretrained,
-            finetune_layers=finetune_layers,
             use_cuda=use_cuda
         )
 
