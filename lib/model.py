@@ -113,7 +113,7 @@ class D2Net(nn.Module):
                 self.load_state_dict(torch.load(model_file)['model'])
             else:
                 self.load_state_dict(torch.load(model_file, map_location='cpu')['model'])
-                
+
     def forward(self, batch):
         b = batch['image1'].size(0)
 
