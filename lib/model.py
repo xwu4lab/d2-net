@@ -40,9 +40,9 @@ class DenseFeatureExtractionModule(nn.Module):
             self.model = nn.Sequential(
                 *list(model.features.children())[: -2]
             )    
-            
+        
         self.num_channels = 512
-
+        
         # Fix forward parameters
         for param in self.model.parameters():
             param.requires_grad = False
@@ -113,7 +113,7 @@ class D2Net(nn.Module):
                 self.load_state_dict(torch.load(model_file)['model'])
             else:
                 self.load_state_dict(torch.load(model_file, map_location='cpu')['model'])
-
+                
     def forward(self, batch):
         b = batch['image1'].size(0)
 
