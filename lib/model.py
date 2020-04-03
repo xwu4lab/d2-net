@@ -39,7 +39,7 @@ class DenseFeatureExtractionModule(nn.Module):
             model = models.resnet50(pretrained=True)
 
             self.model = nn.Sequential(
-                *list(model.children())[: -2]
+                *list(model.children())[: -3]
             )
 
         self.num_channels = 512
