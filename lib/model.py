@@ -30,17 +30,31 @@ class DenseFeatureExtractionModule(nn.Module):
                 self.model = nn.Sequential(
                     *list(model.features.children())[: conv4_3_idx + 1]
                 )
+
+                print('Using VGG16 Truncated')
             else:
                 conv5_3_idx = vgg16_layers.index('conv5_3')
                 self.model = nn.Sequential(
                     *list(model.features.children())[: conv5_3_idx + 1]
-                )    
+                )
+
+                print('Using VGG16 Full')
         else:
             model = models.resnet50(pretrained=True)
 
-            self.model = nn.Sequential(
-                *list(model.children())[: -3]
-            )
+            if 1:
+                self.model = nn.Sequential(
+                    *list(model.children())[: -3]
+                )
+
+                print('Using Res50 Truncated')
+            else:
+                self.model = nn.Sequential(
+                    *list(model.children())[: -2]
+                )
+
+                print('Using Res50 Full')
+
 
         self.num_channels = 512
         
