@@ -6,7 +6,7 @@ import torchvision.models as models
 
 
 class DenseFeatureExtractionModule(nn.Module):
-    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=3, model_type=None):
+    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None):
         super(DenseFeatureExtractionModule, self).__init__()
         
         if model_type == 'vgg16':
@@ -25,9 +25,9 @@ class DenseFeatureExtractionModule(nn.Module):
                 'pool5'
             ]
 
-            if truncated_blocks == 3:
+            if truncated_blocks == 2:
                 conv_idx = vgg16_layers.index('conv4_3')
-            elif truncated_blocks == 2:
+            elif truncated_blocks == 1:
                 conv_idx = vgg16_layers.index('conv5_3')
             
             self.model = nn.Sequential(
@@ -37,7 +37,7 @@ class DenseFeatureExtractionModule(nn.Module):
         elif model_type == 'res50':
             model = models.resnet50(pretrained=True)
             self.model = nn.Sequential(
-                *list(model.children())[: -truncated_blocks]
+                *list(model.children())[: -truncated_blocks-1]
             )
 
 
@@ -95,7 +95,7 @@ class SoftDetectionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=3, model_type=None):
+    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(

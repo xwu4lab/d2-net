@@ -112,7 +112,7 @@ parser.add_argument(
     help='number of layers for finetuning'
 )
 parser.add_argument(
-    '--truncated_blocks', type=int, default=3,
+    '--truncated_blocks', type=int, default=2,
     help='number of truncated blocks'
 )
 
@@ -131,9 +131,9 @@ if args.plot:
 
 # calculate scaling step 
 if args.model_type == 'vgg16':
-    scaling_steps = 6-args.truncated_blocks
+    scaling_steps = 5-args.truncated_blocks
 elif args.model_type == 'res50':
-    scaling_steps = 7-args.truncated_blocks
+    scaling_steps = 6-args.truncated_blocks
 
 # Creating CNN model
 model = D2Net(
