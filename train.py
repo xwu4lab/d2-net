@@ -184,6 +184,7 @@ def process_epoch(
 
         try:
             loss = loss_function(model, batch, device, scaling_steps=args.scaling_steps, plot=args.plot)
+            print(loss)
         except NoGradientError:
             continue
 
