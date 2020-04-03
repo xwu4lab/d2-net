@@ -24,23 +24,17 @@ class DenseFeatureExtractionModule(nn.Module):
             'pool5'
         ]
         
-        conv4_3_idx = vgg16_layers.index('conv4_3')
+        #conv4_3_idx = vgg16_layers.index('conv4_3')
+
+        #self.model = nn.Sequential(
+        #    *list(model.features.children())[: conv4_3_idx + 1]
+        #)
+
+        conv5_3_idx = vgg16_layers.index('conv5_3')
 
         self.model = nn.Sequential(
-            *list(model.features.children())[: conv4_3_idx + 1]
-        )
-            
-        #model = models.vgg16(pretrained=True)
-            
-        #self.model = nn.Sequential(
-        #    *list(model.features.children())[: -2]
-        #)
-        
-        #model = models.res50(pretrained=True)
-            
-        #self.model = nn.Sequential(
-        #    *list(model.features.children())[: -2]
-        #)    
+            *list(model.features.children())[: conv5_3_idx + 1]
+        ) 
         
         self.num_channels = 512
         

@@ -104,18 +104,6 @@ parser.add_argument(
     help='prefix for training checkpoints'
 )
 parser.add_argument(
-    '--model_type', type=str, default='vgg_trunc',
-    help='model type name'
-)
-parser.add_argument(
-    '--pretrained', type=bool, default=False,
-    help='use imagenet pretrained model or not'
-)
-parser.add_argument(
-    '--finetune_layers', type=int, default=2,
-    help='layers to be finetuned'
-)
-parser.add_argument(
     '--scaling_steps', type=int, default=3,
     help='scaling factor to recover the downscaled feature positions'
 )
