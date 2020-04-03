@@ -1,5 +1,5 @@
 This is a brief instruction to use the train.py for our test
-
+```ruby
 python train.py 
 	--use_validation 
 	--dataset_path 		/path/to/megadepth 
@@ -7,7 +7,8 @@ python train.py
 	--model_type 		vgg16 or res50 or res101
 	--truncated_block 	1 or 2 
 	--finetune_layers	2 or more
-
+```
 After training, pls save the checkpoint and log.txt for evaluation using
-
+```ruby
 tar -czvf nameOfTestSetting.tar.gz checkpoints/ log.txt
+```
