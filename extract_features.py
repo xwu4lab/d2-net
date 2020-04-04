@@ -33,7 +33,7 @@ parser.add_argument(
     help='image preprocessing (caffe or torch)'
 )
 parser.add_argument(
-    '--model_file', type=str, default='models/d2_tf.pth',
+    '--model_file', type=str, default=None,
     help='path to the full model'
 )
 
@@ -67,6 +67,15 @@ parser.add_argument(
 )
 parser.set_defaults(use_relu=True)
 
+parser.add_argument(
+    '--model_type', type=str, default='vgg16',
+    help='type of pretrained model'
+)
+parser.add_argument(
+    '--truncated_blocks', type=int, default=2,
+    help='number of truncated blocks'
+)
+
 args = parser.parse_args()
 
 print(args)
@@ -75,7 +84,9 @@ print(args)
 model = D2Net(
     model_file=args.model_file,
     use_relu=args.use_relu,
-    use_cuda=use_cuda
+    use_cuda=use_cuda,
+    truncated_blocks=args.truncated_blocks,
+    model_type=args.model_type
 )
 
 # Process the file

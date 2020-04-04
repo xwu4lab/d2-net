@@ -2,55 +2,81 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import torchvision.models as models
 
 class DenseFeatureExtractionModule(nn.Module):
-    def __init__(self, use_relu=True, use_cuda=True):
+    def __init__(self, use_relu=True, use_cuda=True, truncated_blocks=2, model_type=None):
         super(DenseFeatureExtractionModule, self).__init__()
 
-        self.model = nn.Sequential(
-            nn.Conv2d(3, 64, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(64, 64, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, stride=2),
-            nn.Conv2d(64, 128, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(128, 128, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, stride=2),
-            nn.Conv2d(128, 256, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.AvgPool2d(2, stride=1),
-            nn.Conv2d(256, 512, 3, padding=2, dilation=2),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(512, 512, 3, padding=2, dilation=2),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(512, 512, 3, padding=2, dilation=2),
-        )
-        self.num_channels = 512
+        self.model_type = model_type
+
+        if model_type == 'vgg16':
+            self.model = nn.Sequential(
+                nn.Conv2d(3, 64, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(64, 64, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(2, stride=2),
+                nn.Conv2d(64, 128, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(128, 128, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(2, stride=2),
+                nn.Conv2d(128, 256, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(256, 256, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(256, 256, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.AvgPool2d(2, stride=1),
+                nn.Conv2d(256, 512, 3, padding=2, dilation=2),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(512, 512, 3, padding=2, dilation=2),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(512, 512, 3, padding=2, dilation=2),
+            )
+            self.num_channels = 512
+
+        elif model_type == 'res50':
+            model = models.resnet50(pretrained=False)
+            self.model = nn.Sequential(
+                *list(model.children())[: -truncated_blocks-1]
+            )
+            self.num_channels = int(4096/(2**truncated_blocks))
+
+        elif model_type == 'res101':
+            model = models.resnet101(pretrained=True)
+            self.model = nn.Sequential(
+                *list(model.children())[: -truncated_blocks-1]
+            )
+            self.num_channels = int(4096/(2**truncated_blocks))
 
         self.use_relu = use_relu
-
+        
         if use_cuda:
             self.model = self.model.cuda()
 
     def forward(self, batch):
-        output = self.model(batch)
-        if self.use_relu:
-            output = F.relu(output)
+        if self.model_type == 'vgg16':
+            output = self.model(batch)
+            if self.use_relu:
+                output = F.relu(output)
+        elif self.model_type == 'res50':
+            output = self.model(batch)
+        elif self.model_type == 'res101':
+            output = self.model(batch)            
         return output
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_relu=True, use_cuda=True):
+    def __init__(self, model_file=None, use_relu=True, use_cuda=True, truncated_blocks=2, model_type=None):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(
-            use_relu=use_relu, use_cuda=use_cuda
+            use_relu=use_relu, 
+            use_cuda=use_cuda,
+            truncated_blocks=truncated_blocks,
+            model_type=model_type
         )
 
         self.detection = HardDetectionModule()
