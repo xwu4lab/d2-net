@@ -58,9 +58,8 @@ class DenseFeatureExtractionModule(nn.Module):
                     self.model[5][3].bn3 = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
                     self.model[5][0].downsample[0] = nn.Conv2d(256, output_size, kernel_size=(1, 1), stride=(2, 2), bias=False)
                     self.model[5][0].downsample[1] = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-                
-            else:
-                print("Oops!  You truncate too much.  Try again...")
+                else:
+                    print("Oops!  You truncate too much.  Try again...")
 
         elif model_type == 'res101':
             model = models.resnet101(pretrained=True)
