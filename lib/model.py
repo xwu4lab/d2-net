@@ -90,6 +90,7 @@ class DenseFeatureExtractionModule(nn.Module):
 
     def forward(self, batch):
         output = self.model(batch)
+        print(output.size())
         return output
 
 
