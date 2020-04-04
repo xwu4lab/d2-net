@@ -6,7 +6,7 @@ import torchvision.models as models
 
 
 class DenseFeatureExtractionModule(nn.Module):
-    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None):
+    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, output_size=0):
         super(DenseFeatureExtractionModule, self).__init__()
         
         if model_type == 'vgg16':
@@ -27,15 +27,10 @@ class DenseFeatureExtractionModule(nn.Module):
 
             if truncated_blocks == 3:
                 conv_idx = vgg16_layers.index('conv3_3')
-                self.num_channels = 256
             elif truncated_blocks == 2:
                 conv_idx = vgg16_layers.index('conv4_3')
-                self.num_channels = 512
             elif truncated_blocks == 1:
                 conv_idx = vgg16_layers.index('conv5_3')
-                self.num_channels = 1024
-            else:
-                print("Oops!  You truncate too much.  Try again...")
             
             self.model = nn.Sequential(
                 *list(model.features.children())[: conv_idx + 1]
@@ -46,33 +41,32 @@ class DenseFeatureExtractionModule(nn.Module):
             self.model = nn.Sequential(
                 *list(model.children())[: -truncated_blocks-1]
             )
-
-            if truncated_blocks == 1:
-                self.num_channels = 2048
-            elif truncated_blocks == 2:
-                self.num_channels = 1024
-            elif truncated_blocks == 3:
-                self.num_channels = 512
+            if output_size > 0:
+                if truncated_blocks == 1:
+                    self.model[7][2].conv3 = nn.Conv2d(512, output_size, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                    self.model[7][2].bn3 = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                    self.model[7][0].downsample[0] = nn.Conv2d(1024, output_size, kernel_size=(1, 1), stride=(2, 2), bias=False)
+                    self.model[7][0].downsample[1] = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                
+                elif truncated_blocks == 2:
+                    self.model[6][5].conv3 = nn.Conv2d(256, output_size, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                    self.model[6][5].bn3 = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                    self.model[6][0].downsample[0] = nn.Conv2d(512, output_size, kernel_size=(1, 1), stride=(2, 2), bias=False)
+                    self.model[6][0].downsample[1] = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                elif truncated_blocks == 3:
+                    self.model[5][3].conv3 = nn.Conv2d(128, output_size, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                    self.model[5][3].bn3 = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                    self.model[5][0].downsample[0] = nn.Conv2d(256, output_size, kernel_size=(1, 1), stride=(2, 2), bias=False)
+                    self.model[5][0].downsample[1] = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                
             else:
                 print("Oops!  You truncate too much.  Try again...")
-            
+
         elif model_type == 'res101':
             model = models.resnet101(pretrained=True)
             self.model = nn.Sequential(
                 *list(model.children())[: -truncated_blocks-1]
             )
-
-            if truncated_blocks == 1:
-                self.num_channels = 2048
-            elif truncated_blocks == 2:
-                self.num_channels = 1024
-            elif truncated_blocks == 3:
-                self.num_channels = 512
-            else:
-                print("Oops!  You truncate too much.  Try again...")
-            
-
-        
         
         # Fix forward parameters
         for param in self.model.parameters():
@@ -81,7 +75,20 @@ class DenseFeatureExtractionModule(nn.Module):
             # Unlock conv4_3
             for param in list(self.model.parameters())[-finetune_layers :]:
                 param.requires_grad = True
+            
+            if model_type == 'res50':
+                if truncated_blocks == 1:
+                    for param in list(self.model[7][0].downsample.parameters()):
+                        param.requires_grad = True
+                if truncated_blocks == 2:
+                    for param in list(self.model[6][0].downsample.parameters()):
+                        param.requires_grad = True
+                if truncated_blocks == 3:
+                    for param in list(self.model[5][0].downsample.parameters()):
+                        param.requires_grad = True
+                
 
+                
         if use_cuda:
             self.model = self.model.cuda()
 
@@ -126,7 +133,7 @@ class SoftDetectionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None):
+    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, output_size=0):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(
@@ -134,7 +141,8 @@ class D2Net(nn.Module):
             use_cuda=use_cuda,
             finetune_layers=finetune_layers,
             truncated_blocks=truncated_blocks,
-            model_type=model_type
+            model_type=model_type,
+            output_size=output_size
         )
 
         self.detection = SoftDetectionModule()

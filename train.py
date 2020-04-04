@@ -115,6 +115,10 @@ parser.add_argument(
     '--truncated_blocks', type=int, default=2,
     help='number of truncated blocks'
 )
+parser.add_argument(
+    '--output_size', type=int, default=0,
+    help='dimensions of output descriptor'
+)
 
 
 args = parser.parse_args()
@@ -147,7 +151,8 @@ model = D2Net(
     use_cuda=use_cuda,
     finetune_layers=args.finetune_layers,
     truncated_blocks=args.truncated_blocks,
-    model_type=args.model_type
+    model_type=args.model_type,
+    output_size=args.output_size
 )
 
 # Optimizer
