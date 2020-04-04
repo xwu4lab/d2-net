@@ -42,12 +42,12 @@ class DenseFeatureExtractionModule(nn.Module):
                 *list(model.children())[: -truncated_blocks-1]
             )
             if output_size > 0:
+                print(output_size)
                 if truncated_blocks == 1:
                     self.model[7][2].conv3 = nn.Conv2d(512, output_size, kernel_size=(1, 1), stride=(1, 1), bias=False)
                     self.model[7][2].bn3 = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
                     self.model[7][0].downsample[0] = nn.Conv2d(1024, output_size, kernel_size=(1, 1), stride=(2, 2), bias=False)
                     self.model[7][0].downsample[1] = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-                
                 elif truncated_blocks == 2:
                     self.model[6][5].conv3 = nn.Conv2d(256, output_size, kernel_size=(1, 1), stride=(1, 1), bias=False)
                     self.model[6][5].bn3 = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
@@ -84,10 +84,7 @@ class DenseFeatureExtractionModule(nn.Module):
                         param.requires_grad = True
                 if truncated_blocks == 3:
                     for param in list(self.model[5][0].downsample.parameters()):
-                        param.requires_grad = True
-                
-
-                
+                        param.requires_grad = True   
         if use_cuda:
             self.model = self.model.cuda()
 
