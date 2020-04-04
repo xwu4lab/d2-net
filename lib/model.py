@@ -6,7 +6,7 @@ import torchvision.models as models
 
 
 class DenseFeatureExtractionModule(nn.Module):
-    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None):
+    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, finetune_skip_layers=True):
         super(DenseFeatureExtractionModule, self).__init__()
         
         if model_type == 'vgg16':
@@ -52,20 +52,17 @@ class DenseFeatureExtractionModule(nn.Module):
         for param in self.model.parameters():
             param.requires_grad = False
         if finetune_feature_extraction:
-            # Unlock conv4_3
-            for param in list(self.model.parameters())[-finetune_layers :]:
-                param.requires_grad = True
+            if model_type == 'vgg16':
+                for param in list(self.model.parameters())[-finetune_layers :]:
+                    param.requires_grad = True
+                
+            elif model_type == 'res50':
+                for param in list(self.model[-1][-finetune_layers :].parameters()):
+                    param.requires_grad = True
+                if finetune_skip_layers:
+                    for param in list(self.model[-1][0].downsample.parameters()):
+                        param.requires_grad = True
             
-            if model_type == 'res50':
-                if truncated_blocks == 1:
-                    for param in list(self.model[7][0].downsample.parameters()):
-                        param.requires_grad = True
-                if truncated_blocks == 2:
-                    for param in list(self.model[6][0].downsample.parameters()):
-                        param.requires_grad = True
-                if truncated_blocks == 3:
-                    for param in list(self.model[5][0].downsample.parameters()):
-                        param.requires_grad = True   
         if use_cuda:
             self.model = self.model.cuda()
 
@@ -110,7 +107,7 @@ class SoftDetectionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None):
+    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, finetune_skip_layers=True):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(
@@ -118,7 +115,8 @@ class D2Net(nn.Module):
             use_cuda=use_cuda,
             finetune_layers=finetune_layers,
             truncated_blocks=truncated_blocks,
-            model_type=model_type
+            model_type=model_type,
+            finetune_skip_layers=finetune_skip_layers
         )
 
         self.detection = SoftDetectionModule()
