@@ -42,6 +42,18 @@ class DenseFeatureExtractionModule(nn.Module):
                 *list(model.children())[: -truncated_blocks-1]
             )
 
+            if truncated_blocks == 1:
+                self.model[7][2].conv3 = nn.Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                self.model[7][2].bn3 = nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            elif truncated_blocks == 2:
+                self.model[6][5].conv3 = nn.Conv2d(256, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                self.model[6][5].bn3 = nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            elif truncated_blocks == 3:
+                self.model[5][3].conv3 = nn.Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                self.model[5][3].bn3 = nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            else:
+                print("Oops!  You truncate too much.  Try again...")
+
         elif model_type == 'res101':
             model = models.resnet101(pretrained=True)
             self.model = nn.Sequential(
