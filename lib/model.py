@@ -6,7 +6,7 @@ import torchvision.models as models
 
 
 class DenseFeatureExtractionModule(nn.Module):
-    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, output_size=0):
+    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None):
         super(DenseFeatureExtractionModule, self).__init__()
         
         if model_type == 'vgg16':
@@ -41,25 +41,6 @@ class DenseFeatureExtractionModule(nn.Module):
             self.model = nn.Sequential(
                 *list(model.children())[: -truncated_blocks-1]
             )
-            if output_size > 0:
-                print(output_size)
-                if truncated_blocks == 1:
-                    self.model[7][2].conv3 = nn.Conv2d(512, output_size, kernel_size=(1, 1), stride=(1, 1), bias=False)
-                    self.model[7][2].bn3 = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-                    self.model[7][0].downsample[0] = nn.Conv2d(1024, output_size, kernel_size=(1, 1), stride=(2, 2), bias=False)
-                    self.model[7][0].downsample[1] = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-                elif truncated_blocks == 2:
-                    self.model[6][5].conv3 = nn.Conv2d(256, output_size, kernel_size=(1, 1), stride=(1, 1), bias=False)
-                    self.model[6][5].bn3 = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-                    self.model[6][0].downsample[0] = nn.Conv2d(512, output_size, kernel_size=(1, 1), stride=(2, 2), bias=False)
-                    self.model[6][0].downsample[1] = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-                elif truncated_blocks == 3:
-                    self.model[5][3].conv3 = nn.Conv2d(128, output_size, kernel_size=(1, 1), stride=(1, 1), bias=False)
-                    self.model[5][3].bn3 = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-                    self.model[5][0].downsample[0] = nn.Conv2d(256, output_size, kernel_size=(1, 1), stride=(2, 2), bias=False)
-                    self.model[5][0].downsample[1] = nn.BatchNorm2d(output_size, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-                else:
-                    print("Oops!  You truncate too much.  Try again...")
 
         elif model_type == 'res101':
             model = models.resnet101(pretrained=True)
@@ -90,7 +71,6 @@ class DenseFeatureExtractionModule(nn.Module):
 
     def forward(self, batch):
         output = self.model(batch)
-        print(output.size())
         return output
 
 
@@ -130,7 +110,7 @@ class SoftDetectionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, output_size=0):
+    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(
@@ -138,8 +118,7 @@ class D2Net(nn.Module):
             use_cuda=use_cuda,
             finetune_layers=finetune_layers,
             truncated_blocks=truncated_blocks,
-            model_type=model_type,
-            output_size=output_size
+            model_type=model_type
         )
 
         self.detection = SoftDetectionModule()
