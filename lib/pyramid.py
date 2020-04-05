@@ -28,8 +28,7 @@ def process_multiscale(image, model, scales=[.5, 1, 2],scaling_steps=2):
 
         dense_features = model.dense_feature_extraction(current_image)
         del current_image
-        print(image.size())
-        print(dense_features.size())
+
         _, _, h, w = dense_features.size()
 
         # Sum the feature maps.
