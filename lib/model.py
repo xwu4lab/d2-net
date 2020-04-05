@@ -86,8 +86,8 @@ class DenseFeatureExtractionModule(nn.Module):
         if use_cuda:
             self.model = self.model.cuda()
         
-        print(model)
-        
+        print(self.model)
+
     def forward(self, batch):
         output = self.model(batch)
         return output
