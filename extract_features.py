@@ -68,7 +68,7 @@ parser.add_argument(
 parser.set_defaults(use_relu=True)
 
 parser.add_argument(
-    '--model_type', type=str, default='vgg16',
+    '--model_type', type=str, default='res50',
     help='type of pretrained model'
 )
 parser.add_argument(

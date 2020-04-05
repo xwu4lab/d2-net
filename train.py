@@ -104,7 +104,7 @@ parser.add_argument(
     help='prefix for training checkpoints'
 )
 parser.add_argument(
-    '--model_type', type=str, default='vgg16',
+    '--model_type', type=str, default='res50',
     help='type of pretrained model'
 )
 parser.add_argument(
