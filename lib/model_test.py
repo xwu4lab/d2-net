@@ -69,7 +69,7 @@ class DenseFeatureExtractionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_relu=True, use_cuda=True, truncated_blocks=2, model_type=None):
+    def __init__(self, model_file=None, use_relu=True, use_cuda=True, truncated_blocks=2, model_type=None, edge_threshold=5):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(
@@ -79,7 +79,7 @@ class D2Net(nn.Module):
             model_type=model_type
         )
 
-        self.detection = HardDetectionModule()
+        self.detection = HardDetectionModule(edge_threshold=edge_threshold)
 
         self.localization = HandcraftedLocalizationModule()
 

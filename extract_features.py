@@ -75,7 +75,10 @@ parser.add_argument(
     '--truncated_blocks', type=int, default=2,
     help='number of truncated blocks'
 )
-
+parser.add_argument(
+    '--edge_threshold', type=float, default=5,
+    help='edge threshold to select feature'
+)
 args = parser.parse_args()
 
 print(args)
@@ -94,7 +97,8 @@ model = D2Net(
     use_relu=args.use_relu,
     use_cuda=use_cuda,
     truncated_blocks=args.truncated_blocks,
-    model_type=args.model_type
+    model_type=args.model_type,
+    edge_threshold=args.edge_threshold
 )
 
 # Process the file
