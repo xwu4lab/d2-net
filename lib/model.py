@@ -37,8 +37,7 @@ class DenseFeatureExtractionModule(nn.Module):
             )
             
         elif model_type == 'res50':
-            model = models.segmentation.deeplabv3_resnet50(pretrained=True)
-            #model = models.resnet50(pretrained=True)
+            model = models.resnet50(pretrained=True)
             self.model = nn.Sequential(
                 *list(model.children())[: -truncated_blocks-1]
             )
@@ -58,6 +57,13 @@ class DenseFeatureExtractionModule(nn.Module):
                     param.requires_grad = True
                 
             elif model_type == 'res50':
+                for param in list(self.model[-1][-finetune_layers :].parameters()):
+                    param.requires_grad = True
+                if finetune_skip_layers:
+                    for param in list(self.model[-1][0].downsample.parameters()):
+                        param.requires_grad = True
+            
+            elif model_type == 'res101':
                 for param in list(self.model[-1][-finetune_layers :].parameters()):
                     param.requires_grad = True
                 if finetune_skip_layers:
