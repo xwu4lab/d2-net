@@ -119,7 +119,14 @@ parser.add_argument(
     '--finetune_skip_layers', type=bool, default=True,
     help='finetune the skip connection or not'
 )
-
+parser.add_argument(
+    '--use_dilation', type=bool, default=True,
+    help='use dilation or not'
+)
+parser.add_argument(
+    '--use_upsample', type=bool, default=True,
+    help='use upsample or not (usually same as use_dilation)'
+)
 args = parser.parse_args()
 
 print(args)
@@ -136,9 +143,15 @@ if args.plot:
 if args.model_type == 'vgg16':
     scaling_steps = 5-args.truncated_blocks
 elif args.model_type == 'res50':
-    scaling_steps = 6-args.truncated_blocks
+    if (args.use_upsample):
+        scaling_steps = 5-args.truncated_blocks
+    else:
+        scaling_steps = 6-args.truncated_blocks
 elif args.model_type == 'res101':
-    scaling_steps = 6-args.truncated_blocks
+    if (args.use_upsample):
+        scaling_steps = 5-args.truncated_blocks
+    else:
+        scaling_steps = 6-args.truncated_blocks
 
 # print information for check
 print('The %s model is used for this testing (truncated at -%s block and finetune last %s layers) ' 
@@ -151,7 +164,9 @@ model = D2Net(
     finetune_layers=args.finetune_layers,
     truncated_blocks=args.truncated_blocks,
     model_type=args.model_type,
-    finetune_skip_layers=args.finetune_skip_layers
+    finetune_skip_layers=args.finetune_skip_layers,
+    use_dilation=args.use_dilation,
+    use_upsample=args.use_upsample
 )
 
 # Optimizer
