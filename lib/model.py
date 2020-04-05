@@ -127,7 +127,7 @@ class SoftDetectionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, finetune_skip_layers=True, use_dilation=False, use_upsample=True):
+    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, finetune_skip_layers=True, use_dilation=True, use_upsample=True):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(

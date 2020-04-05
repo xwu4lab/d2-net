@@ -28,7 +28,8 @@ def process_multiscale(image, model, scales=[.5, 1, 2],scaling_steps=2):
 
         dense_features = model.dense_feature_extraction(current_image)
         del current_image
-
+        print(image.size())
+        print(dense_features.size())
         _, _, h, w = dense_features.size()
 
         # Sum the feature maps.
@@ -117,7 +118,7 @@ def process_multiscale(image, model, scales=[.5, 1, 2],scaling_steps=2):
         previous_dense_features = dense_features
         del dense_features
     del previous_dense_features, banned
-    print(all_keypoints.size())
+
     keypoints = all_keypoints.t().numpy()
     del all_keypoints
     scores = all_scores.numpy()
