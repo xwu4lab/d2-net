@@ -80,6 +80,14 @@ args = parser.parse_args()
 
 print(args)
 
+# calculate scaling step 
+if args.model_type == 'vgg16':
+    scaling_steps = 4-args.truncated_blocks
+elif args.model_type == 'res50':
+    scaling_steps = 6-args.truncated_blocks
+elif args.model_type == 'res101':
+    scaling_steps = 6-args.truncated_blocks
+
 # Creating CNN model
 model = D2Net(
     model_file=args.model_file,
@@ -127,7 +135,8 @@ for line in tqdm(lines, total=len(lines)):
                     input_image[np.newaxis, :, :, :].astype(np.float32),
                     device=device
                 ),
-                model
+                model,
+                scaling_steps=scaling_steps
             )
         else:
             keypoints, scores, descriptors = process_multiscale(
@@ -136,7 +145,8 @@ for line in tqdm(lines, total=len(lines)):
                     device=device
                 ),
                 model,
-                scales=[1]
+                scales=[1],
+                scaling_steps=scaling_steps
             )
 
     # Input image coordinates

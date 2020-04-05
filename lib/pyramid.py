@@ -6,7 +6,7 @@ from lib.exceptions import EmptyTensorError
 from lib.utils import interpolate_dense_features, upscale_positions
 
 
-def process_multiscale(image, model, scales=[.5, 1, 2]):
+def process_multiscale(image, model, scales=[.5, 1, 2],scaling_steps=2):
     b, _, h_init, w_init = image.size()
     device = image.device
     assert(b == 1)
@@ -87,7 +87,7 @@ def process_multiscale(image, model, scales=[.5, 1, 2]):
         fmap_keypoints = fmap_keypoints[:, ids]
         del ids
 
-        keypoints = upscale_positions(fmap_keypoints, scaling_steps=2)
+        keypoints = upscale_positions(fmap_keypoints, scaling_steps=scaling_steps)
         del fmap_keypoints
 
         descriptors = F.normalize(raw_descriptors, dim=0).cpu()
