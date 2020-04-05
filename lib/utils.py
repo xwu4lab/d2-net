@@ -79,6 +79,7 @@ def interpolate_dense_features(pos, dense_features, return_corners=False):
     ids = torch.arange(0, pos.size(1), device=device)
 
     _, h, w = dense_features.size()
+    print(dense_features.size())
 
     i = pos[0, :]
     j = pos[1, :]

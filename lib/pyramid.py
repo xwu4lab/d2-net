@@ -61,7 +61,7 @@ def process_multiscale(image, model, scales=[.5, 1, 2],scaling_steps=2):
             1, fmap_pos[0, :], fmap_pos[1, :], fmap_pos[2, :]
         ]
         del displacements
-
+        
         mask = torch.min(
             torch.abs(displacements_i) < 0.5,
             torch.abs(displacements_j) < 0.5

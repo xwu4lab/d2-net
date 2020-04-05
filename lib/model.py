@@ -37,7 +37,8 @@ class DenseFeatureExtractionModule(nn.Module):
             )
             
         elif model_type == 'res50':
-            model = models.resnet50(pretrained=True)
+            model = models.segmentation.fcn_resnet50(pretrained=True)
+            #model = models.resnet50(pretrained=True)
             self.model = nn.Sequential(
                 *list(model.children())[: -truncated_blocks-1]
             )
