@@ -67,6 +67,7 @@ class DenseFeatureExtractionModule(nn.Module):
         if use_cuda:
             self.model = self.model.cuda()
 
+        print(self.model)
     def forward(self, batch):
         if self.model_type == 'vgg16':
             output = self.model(batch)
