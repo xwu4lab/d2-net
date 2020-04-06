@@ -65,7 +65,7 @@ class DenseFeatureExtractionModule(nn.Module):
                                                               kernel_size=(1, 1), stride=(1, 1), 
                                                               bias=False)
                     elif truncated_blocks+i == 5:
-                        self.model[-i]=nn.MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+                        self.model[3]=nn.MaxPool2d(kernel_size=1, stride=1, padding=0, dilation=1, ceil_mode=False)
                     else:
                         print('You dilate too much')
             self.num_channels = int(4096/(2**truncated_blocks))
@@ -98,7 +98,7 @@ class DenseFeatureExtractionModule(nn.Module):
                                                               bias=False)
                     
                     elif truncated_blocks+i == 5:
-                        self.model[-i]=nn.MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+                        self.model[3]=nn.MaxPool2d(kernel_size=1, stride=1, padding=0, dilation=1, ceil_mode=False)
                     else:
                         print('You dilate too much')
 
