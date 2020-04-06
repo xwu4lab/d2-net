@@ -6,7 +6,7 @@ import torchvision.models as models
 
 
 class DenseFeatureExtractionModule(nn.Module):
-    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, finetune_skip_layers=True, use_dilation=False, use_upsample=True):
+    def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, finetune_skip_layers=True, dilation_blocks=1):
         super(DenseFeatureExtractionModule, self).__init__()
         
         numLayers = [6, 4, 3]
@@ -44,22 +44,32 @@ class DenseFeatureExtractionModule(nn.Module):
                 *list(model.children())[: -truncated_blocks-1]
             )
 
-            if use_dilation:
-                for k in range(1,numLayers[truncated_blocks-2]):
-                    self.model[-1][k].conv2=nn.Conv2d(int(256/(truncated_blocks-1)),  int(256/(truncated_blocks-1)),  kernel_size=(3, 3), stride=(1, 1), padding=(2, 2), dilation=(2,2), bias=False)
-                    
-            if use_upsample:
-                self.model[-1][0].conv2=nn.Conv2d(int(256/(truncated_blocks-1)), int(256/(truncated_blocks-1)), kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-                self.model[-1][0].downsample[0]=nn.Conv2d(int(512/(truncated_blocks-1)), int(1024/(truncated_blocks-1)), kernel_size=(1, 1), stride=(1, 1), bias=False)
-
+            if dilation_blocks:
+                for i in range(1,dilation_blocks+1):
+                    for j in range(1,numLayers[truncated_blocks+i-3]):
+                        self.model[-i][j].conv2=nn.Conv2d(int(256/(truncated_blocks-2+i)),  int(256/(truncated_blocks-2+i)),  kernel_size=(3, 3), stride=(1, 1), padding=(2**(dilation_blocks+1-i), 2**(dilation_blocks+1-i)), dilation=(2**(dilation_blocks+1-i),2**(dilation_blocks+1-i)), bias=False)
                 
+                    self.model[-i][0].conv2=nn.Conv2d(int(256/(truncated_blocks-2+i)), int(256/(truncated_blocks-2+i)), kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                    self.model[-i][0].downsample[0]=nn.Conv2d(int(512/(truncated_blocks-2+i)), int(1024/(truncated_blocks-2+i)), kernel_size=(1, 1), stride=(1, 1), bias=False)
+
+            self.num_channels = int(4096/(2**truncated_blocks))
 
         elif model_type == 'res101':
             model = models.resnet101(pretrained=True)
             self.model = nn.Sequential(
                 *list(model.children())[: -truncated_blocks-1]
             )
-        
+
+            if dilation_blocks:
+                for i in range(1,dilation_blocks+1):
+                    for j in range(1,numLayers[truncated_blocks+i-3]):
+                        self.model[-i][j].conv2=nn.Conv2d(int(256/(truncated_blocks-2+i)),  int(256/(truncated_blocks-2+i)),  kernel_size=(3, 3), stride=(1, 1), padding=(2**(dilation_blocks+1-i), 2**(dilation_blocks+1-i)), dilation=(2**(dilation_blocks+1-i),2**(dilation_blocks+1-i)), bias=False)
+                
+                    self.model[-i][0].conv2=nn.Conv2d(int(256/(truncated_blocks-2+i)), int(256/(truncated_blocks-2+i)), kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                    self.model[-i][0].downsample[0]=nn.Conv2d(int(512/(truncated_blocks-2+i)), int(1024/(truncated_blocks-2+i)), kernel_size=(1, 1), stride=(1, 1), bias=False)
+
+            self.num_channels = int(4096/(2**truncated_blocks))
+
 
         # Fix forward parameters
         for param in self.model.parameters():
@@ -129,7 +139,7 @@ class SoftDetectionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, finetune_skip_layers=True, use_dilation=True, use_upsample=True):
+    def __init__(self, model_file=None, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, finetune_skip_layers=True, dilation_blocks=1):
         super(D2Net, self).__init__()
 
         self.dense_feature_extraction = DenseFeatureExtractionModule(
@@ -139,8 +149,7 @@ class D2Net(nn.Module):
             truncated_blocks=truncated_blocks,
             model_type=model_type,
             finetune_skip_layers=finetune_skip_layers,
-            use_dilation=use_dilation,
-            use_upsample=use_upsample
+            dilation_blocks=dilation_blocks
         )
 
         self.detection = SoftDetectionModule()

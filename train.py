@@ -120,12 +120,8 @@ parser.add_argument(
     help='finetune the skip connection or not'
 )
 parser.add_argument(
-    '--use_dilation', type=bool, default=True,
+    '--dilation_blocks', type=int, default=1,
     help='use dilation or not'
-)
-parser.add_argument(
-    '--use_upsample', type=bool, default=True,
-    help='use upsample or not (usually same as use_dilation)'
 )
 args = parser.parse_args()
 
@@ -142,16 +138,13 @@ if args.plot:
 # calculate scaling step 
 if args.model_type == 'vgg16':
     scaling_steps = 5-args.truncated_blocks
+    safe_radius=2**args.truncated_blocks
 elif args.model_type == 'res50':
-    if (args.use_upsample):
-        scaling_steps = 5-args.truncated_blocks
-    else:
-        scaling_steps = 6-args.truncated_blocks
+    scaling_steps = 6-args.dilation_blocks-args.truncated_blocks
+    safe_radius=2**(args.truncated_blocks+args.dilation_blocks-1)
 elif args.model_type == 'res101':
-    if (args.use_upsample):
-        scaling_steps = 5-args.truncated_blocks
-    else:
-        scaling_steps = 6-args.truncated_blocks
+    scaling_steps = 6-args.dilation_blocks-args.truncated_blocks
+    safe_radius=2**(args.truncated_blocks+args.dilation_blocks-1)
 
 # print information for check
 print('The %s model is used for this testing (truncated at -%s block and finetune last %s layers) ' 
@@ -165,8 +158,7 @@ model = D2Net(
     truncated_blocks=args.truncated_blocks,
     model_type=args.model_type,
     finetune_skip_layers=args.finetune_skip_layers,
-    use_dilation=args.use_dilation,
-    use_upsample=args.use_upsample
+    dilation_blocks=args.dilation_blocks
 )
 
 # Optimizer
@@ -226,7 +218,7 @@ def process_epoch(
         batch['log_interval'] = args.log_interval
 
         try:
-            loss = loss_function(model, batch, device, scaling_steps=scaling_steps, plot=args.plot)
+            loss = loss_function(model, batch, device, safe_radius=safe_radius, scaling_steps=scaling_steps, plot=args.plot)
         except NoGradientError:
             continue
 
