@@ -48,22 +48,26 @@ class DenseFeatureExtractionModule(nn.Module):
             if dilation_blocks:
                 for i in range(1,dilation_blocks+1):
                     for j in range(1,numLayers[truncated_blocks+i-2]):
-                        self.model[-i][j].conv2=nn.Conv2d(int(512/(truncated_blocks-1+i)),  
-                                                          int(512/(truncated_blocks-1+i)),  
+                        self.model[-i][j].conv2=nn.Conv2d(int(512/2**(truncated_blocks-2+i)),  
+                                                          int(512/2**(truncated_blocks-2+i)),  
                                                           kernel_size=(3, 3), stride=(1, 1), 
                                                           padding=(2**(dilation_blocks+1-i), 2**(dilation_blocks+1-i)), 
                                                           dilation=(2**(dilation_blocks+1-i),2**(dilation_blocks+1-i)), 
                                                           bias=False)
                 
-                    self.model[-i][0].conv2=nn.Conv2d(int(512/(truncated_blocks-1+i)), 
-                                                      int(512/(truncated_blocks-1+i)), 
-                                                      kernel_size=(3, 3), stride=(1, 1), 
-                                                      padding=(1, 1), bias=False)
-                    self.model[-i][0].downsample[0]=nn.Conv2d(int(1024/(truncated_blocks-1+i)), 
-                                                              int(2048/(truncated_blocks-1+i)), 
+                    if truncated_blocks+i < 5:
+                        self.model[-i][0].conv2=nn.Conv2d(int(512/2**(truncated_blocks-2+i)), 
+                                                        int(512/2**(truncated_blocks-2+i)), 
+                                                        kernel_size=(3, 3), stride=(1, 1), 
+                                                        padding=(1, 1), bias=False)
+                        self.model[-i][0].downsample[0]=nn.Conv2d(int(1024/2**(truncated_blocks-2+i)), 
+                                                                int(2048/2**(truncated_blocks-2+i)), 
                                                               kernel_size=(1, 1), stride=(1, 1), 
                                                               bias=False)
-
+                    elif truncated_blocks+i == 5:
+                        self.model[-i]=nn.MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+                    else:
+                        print('You dilate too much')
             self.num_channels = int(4096/(2**truncated_blocks))
 
         elif model_type == 'res101':
@@ -76,21 +80,27 @@ class DenseFeatureExtractionModule(nn.Module):
             if dilation_blocks:
                 for i in range(1,dilation_blocks+1):
                     for j in range(1,numLayers[truncated_blocks+i-2]):
-                        self.model[-i][j].conv2=nn.Conv2d(int(512/(truncated_blocks-1+i)),  
-                                                          int(512/(truncated_blocks-1+i)),  
+                        self.model[-i][j].conv2=nn.Conv2d(int(512/2**(truncated_blocks-2+i)),  
+                                                          int(512/2**(truncated_blocks-2+i)),  
                                                           kernel_size=(3, 3), stride=(1, 1), 
                                                           padding=(2**(dilation_blocks+1-i), 2**(dilation_blocks+1-i)), 
                                                           dilation=(2**(dilation_blocks+1-i),2**(dilation_blocks+1-i)), 
                                                           bias=False)
                 
-                    self.model[-i][0].conv2=nn.Conv2d(int(512/(truncated_blocks-1+i)), 
-                                                      int(512/(truncated_blocks-1+i)), 
-                                                      kernel_size=(3, 3), stride=(1, 1), 
-                                                      padding=(1, 1), bias=False)
-                    self.model[-i][0].downsample[0]=nn.Conv2d(int(1024/(truncated_blocks-1+i)), 
-                                                              int(2048/(truncated_blocks-1+i)), 
+                    if truncated_blocks+i < 5:
+                        self.model[-i][0].conv2=nn.Conv2d(int(512/2**(truncated_blocks-2+i)), 
+                                                        int(512/2**(truncated_blocks-2+i)), 
+                                                        kernel_size=(3, 3), stride=(1, 1), 
+                                                        padding=(1, 1), bias=False)
+                        self.model[-i][0].downsample[0]=nn.Conv2d(int(1024/2**(truncated_blocks-2+i)), 
+                                                                int(2048/2**(truncated_blocks-2+i)), 
                                                               kernel_size=(1, 1), stride=(1, 1), 
                                                               bias=False)
+                    
+                    elif truncated_blocks+i == 5:
+                        self.model[-i]=nn.MaxPool2d(kernel_size=3, stride=1, padding=1, dilation=1, ceil_mode=False)
+                    else:
+                        print('You dilate too much')
 
             self.num_channels = int(4096/(2**truncated_blocks))
 
