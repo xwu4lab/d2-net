@@ -4,6 +4,8 @@ import torch.nn.functional as F
 
 import torchvision.models as models
 
+from lib.pspnet import PSPNet
+
 class DenseFeatureExtractionModule(nn.Module):
     def __init__(self, use_relu=True, use_cuda=True, truncated_blocks=2, model_type=None, dilation_blocks=1):
         super(DenseFeatureExtractionModule, self).__init__()
@@ -124,26 +126,46 @@ class DenseFeatureExtractionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_relu=True, use_cuda=True, truncated_blocks=2, model_type=None, edge_threshold=5, dilation_blocks=1):
+    def __init__(self, model_file=None, use_relu=True, use_cuda=True, truncated_blocks=2, model_type=None, edge_threshold=5, dilation_blocks=1, pspnetTest=False):
         super(D2Net, self).__init__()
 
-        self.dense_feature_extraction = DenseFeatureExtractionModule(
-            use_relu=use_relu, 
-            use_cuda=use_cuda,
-            truncated_blocks=truncated_blocks,
-            model_type=model_type,
-            dilation_blocks=dilation_blocks
-        )
+        if pspnetTest:
+            self.dense_feature_extraction = PSPNet(
+                n_classes=19, 
+                pyramids=[6, 3, 2, 1], 
+                input_size=[713, 713],
+                use_bn=True, 
+                output_features=False, 
+                output_all=False, 
+                model_type=None, 
+                truncated_blocks=truncated_blocks, 
+                dilation_blocks=dilation_blocks, 
+                d2netTest=True
+            )
+        else:
+            self.dense_feature_extraction = DenseFeatureExtractionModule(
+                use_relu=use_relu, 
+                use_cuda=use_cuda,
+                truncated_blocks=truncated_blocks,
+                model_type=model_type,
+                dilation_blocks=dilation_blocks
+            )
 
         self.detection = HardDetectionModule(edge_threshold=edge_threshold)
 
         self.localization = HandcraftedLocalizationModule()
 
         if model_file is not None:
-            if use_cuda:
-                self.load_state_dict(torch.load(model_file)['model'])
+            if pspnetTest:
+                if use_cuda:
+                    self.load_state_dict(torch.load(model_file)['state_dict'], strict=False)
+                else:
+                    self.load_state_dict(torch.load(model_file, map_location='cpu')['state_dict'], strict=False)
             else:
-                self.load_state_dict(torch.load(model_file, map_location='cpu')['model'])
+                if use_cuda:
+                    self.load_state_dict(torch.load(model_file)['model'])
+                else:
+                    self.load_state_dict(torch.load(model_file, map_location='cpu')['model'])
 
     def forward(self, batch):
         _, _, h, w = batch.size()

@@ -117,11 +117,12 @@ def process_multiscale(image, model, scales=[.5, 1, 2],scaling_steps=2):
         previous_dense_features = dense_features
         del dense_features
     del previous_dense_features, banned
-
+    print(all_keypoints.size())
     keypoints = all_keypoints.t().numpy()
     del all_keypoints
     scores = all_scores.numpy()
     del all_scores
     descriptors = all_descriptors.t().numpy()
     del all_descriptors
+
     return keypoints, scores, descriptors

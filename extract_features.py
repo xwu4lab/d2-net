@@ -83,6 +83,10 @@ parser.add_argument(
     '--dilation_blocks', type=int, default=1,
     help='use dilation or not'
 )
+parser.add_argument(
+    '--pspnetTest', type=bool, default=False,
+    help='use PSPNet Model or not'
+)
 args = parser.parse_args()
 
 print(args)
@@ -103,7 +107,8 @@ model = D2Net(
     truncated_blocks=args.truncated_blocks,
     model_type=args.model_type,
     edge_threshold=args.edge_threshold,
-    dilation_blocks=args.dilation_blocks
+    dilation_blocks=args.dilation_blocks,
+    pspnetTest=args.pspnetTest
 )
 
 # Process the file
