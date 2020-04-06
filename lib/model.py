@@ -9,7 +9,7 @@ class DenseFeatureExtractionModule(nn.Module):
     def __init__(self, finetune_feature_extraction=False, use_cuda=True, finetune_layers=2, truncated_blocks=2, model_type=None, finetune_skip_layers=True, dilation_blocks=1):
         super(DenseFeatureExtractionModule, self).__init__()
         
-        numLayers = [6, 4, 3]
+        numLayers = [3, 6, 4, 3]
 
         if model_type == 'vgg16':
             model = models.vgg16(pretrained=True)
@@ -46,7 +46,7 @@ class DenseFeatureExtractionModule(nn.Module):
 
             if dilation_blocks:
                 for i in range(1,dilation_blocks+1):
-                    for j in range(1,numLayers[truncated_blocks+i-3]):
+                    for j in range(1,numLayers[truncated_blocks+i-2]):
                         self.model[-i][j].conv2=nn.Conv2d(int(512/(truncated_blocks-1+i)),  
                                                           int(512/(truncated_blocks-1+i)),  
                                                           kernel_size=(3, 3), stride=(1, 1), 
@@ -73,7 +73,7 @@ class DenseFeatureExtractionModule(nn.Module):
 
             if dilation_blocks:
                 for i in range(1,dilation_blocks+1):
-                    for j in range(1,numLayers[truncated_blocks+i-3]):
+                    for j in range(1,numLayers[truncated_blocks+i-2]):
                         self.model[-i][j].conv2=nn.Conv2d(int(512/(truncated_blocks-1+i)),  
                                                           int(512/(truncated_blocks-1+i)),  
                                                           kernel_size=(3, 3), stride=(1, 1), 
