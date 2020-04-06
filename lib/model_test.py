@@ -48,10 +48,21 @@ class DenseFeatureExtractionModule(nn.Module):
             if dilation_blocks:
                 for i in range(1,dilation_blocks+1):
                     for j in range(1,numLayers[truncated_blocks+i-3]):
-                        self.model[-i][j].conv2=nn.Conv2d(int(256/(truncated_blocks-2+i)),  int(256/(truncated_blocks-2+i)),  kernel_size=(3, 3), stride=(1, 1), padding=(2**(dilation_blocks+1-i), 2**(dilation_blocks+1-i)), dilation=(2**(dilation_blocks+1-i),2**(dilation_blocks+1-i)), bias=False)
+                        self.model[-i][j].conv2=nn.Conv2d(int(512/(truncated_blocks-1+i)),  
+                                                          int(512/(truncated_blocks-1+i)),  
+                                                          kernel_size=(3, 3), stride=(1, 1), 
+                                                          padding=(2**(dilation_blocks+1-i), 2**(dilation_blocks+1-i)), 
+                                                          dilation=(2**(dilation_blocks+1-i),2**(dilation_blocks+1-i)), 
+                                                          bias=False)
                 
-                    self.model[-i][0].conv2=nn.Conv2d(int(256/(truncated_blocks-2+i)), int(256/(truncated_blocks-2+i)), kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-                    self.model[-i][0].downsample[0]=nn.Conv2d(int(512/(truncated_blocks-2+i)), int(1024/(truncated_blocks-2+i)), kernel_size=(1, 1), stride=(1, 1), bias=False)
+                    self.model[-i][0].conv2=nn.Conv2d(int(512/(truncated_blocks-1+i)), 
+                                                      int(512/(truncated_blocks-1+i)), 
+                                                      kernel_size=(3, 3), stride=(1, 1), 
+                                                      padding=(1, 1), bias=False)
+                    self.model[-i][0].downsample[0]=nn.Conv2d(int(1024/(truncated_blocks-1+i)), 
+                                                              int(2048/(truncated_blocks-1+i)), 
+                                                              kernel_size=(1, 1), stride=(1, 1), 
+                                                              bias=False)
 
             self.num_channels = int(4096/(2**truncated_blocks))
 
@@ -65,10 +76,21 @@ class DenseFeatureExtractionModule(nn.Module):
             if dilation_blocks:
                 for i in range(1,dilation_blocks+1):
                     for j in range(1,numLayers[truncated_blocks+i-3]):
-                        self.model[-i][j].conv2=nn.Conv2d(int(256/(truncated_blocks-2+i)),  int(256/(truncated_blocks-2+i)),  kernel_size=(3, 3), stride=(1, 1), padding=(2**(dilation_blocks+1-i), 2**(dilation_blocks+1-i)), dilation=(2**(dilation_blocks+1-i),2**(dilation_blocks+1-i)), bias=False)
+                        self.model[-i][j].conv2=nn.Conv2d(int(512/(truncated_blocks-1+i)),  
+                                                          int(512/(truncated_blocks-1+i)),  
+                                                          kernel_size=(3, 3), stride=(1, 1), 
+                                                          padding=(2**(dilation_blocks+1-i), 2**(dilation_blocks+1-i)), 
+                                                          dilation=(2**(dilation_blocks+1-i),2**(dilation_blocks+1-i)), 
+                                                          bias=False)
                 
-                    self.model[-i][0].conv2=nn.Conv2d(int(256/(truncated_blocks-2+i)), int(256/(truncated_blocks-2+i)), kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-                    self.model[-i][0].downsample[0]=nn.Conv2d(int(512/(truncated_blocks-2+i)), int(1024/(truncated_blocks-2+i)), kernel_size=(1, 1), stride=(1, 1), bias=False)
+                    self.model[-i][0].conv2=nn.Conv2d(int(512/(truncated_blocks-1+i)), 
+                                                      int(512/(truncated_blocks-1+i)), 
+                                                      kernel_size=(3, 3), stride=(1, 1), 
+                                                      padding=(1, 1), bias=False)
+                    self.model[-i][0].downsample[0]=nn.Conv2d(int(1024/(truncated_blocks-1+i)), 
+                                                              int(2048/(truncated_blocks-1+i)), 
+                                                              kernel_size=(1, 1), stride=(1, 1), 
+                                                              bias=False)
 
             self.num_channels = int(4096/(2**truncated_blocks))
 
