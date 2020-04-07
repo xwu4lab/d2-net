@@ -223,7 +223,7 @@ for method in methods:
         if method == 'delf' or method == 'delf-new':
             read_function = generate_read_function(method, extension='png',d_patch=dataset_patch)
         else:
-            read_function = generate_read_function(method, d_patch=dataset_patch)
+            read_function = generate_read_function(method, d_patch=dataset_path)
     if os.path.exists(output_file):
         print('Loading precomputed errors...')
         errors[method] = np.load(output_file, allow_pickle=True)
