@@ -131,6 +131,7 @@ class D2Net(nn.Module):
 
         if pspnetTest:
             self.dense_feature_extraction = PSPNet(
+                use_cuda=use_cuda,
                 n_classes=19, 
                 pyramids=[6, 3, 2, 1], 
                 input_size=[713, 713],
