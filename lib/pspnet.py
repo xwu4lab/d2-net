@@ -138,9 +138,6 @@ class PSPNet(nn.Module):
 
         self.num_channels = int(4096/(2**truncated_blocks))
 
-        if use_cuda:
-            self.model = self.model.cuda()
-
     def forward(self, x):
         x_size = x.size()
 

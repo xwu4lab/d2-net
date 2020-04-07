@@ -111,6 +111,9 @@ model = D2Net(
     pspnetTest=args.pspnetTest
 )
 
+if use_cuda:
+    model = model.cuda()
+
 # Process the file
 with open(args.image_list_file, 'r') as f:
     lines = f.readlines()
