@@ -40,10 +40,12 @@ device = torch.device('cuda:0' if use_cuda else 'cpu')
 # names = ['Hes. Aff. + Root-SIFT', 'HAN + HN++', 'DELF', 'DELF New', 'SuperPoint', 'D2-Net', 'D2-Net Trained']
 # colors = ['black', 'orange', 'red', 'red', 'blue', 'purple', 'purple']
 # linestyles = ['-', '-', '-', '--', '-', '-', '--']
-methods = ['hesaff', 'hesaffnet', 'delf', 'delf-new', 'superpoint', 'lf-net', 'd2-net', 'd2-net-ms', 'd2-net-trained', 'd2-net-trained-ms']
-names = ['Hes. Aff. + Root-SIFT', 'HAN + HN++', 'DELF', 'DELF New', 'SuperPoint', 'LF-Net', 'D2-Net', 'D2-Net MS', 'D2-Net Trained', 'D2-Net Trained MS']
-colors = ['black', 'orange', 'red', 'red', 'blue', 'brown', 'purple', 'green', 'purple', 'green']
-linestyles = ['-', '-', '-', '--', '-', '-', '-', '-', '--', '--']
+methods = ['d2-net', 'd2-net-ms', 'd2-net-trained', 'd2-net-trained-ms','pspnet_res50_cs']
+names = [ 'D2-Net', 'D2-Net MS', 'D2-Net Trained', 'D2-Net Trained MS', 'pspnet-res50-cs']
+colors = ['black', 'orange', 'red', 'red', 'blue']
+linestyles = ['-', '-', '-', '--', '-']
+#colors = ['black', 'orange', 'red', 'red', 'blue', 'brown', 'purple', 'green', 'purple', 'green']
+#linestyles = ['-', '-', '-', '--', '-', '-', '-', '-', '--', '--']
 
 
 # In[5]:
@@ -51,7 +53,7 @@ linestyles = ['-', '-', '-', '--', '-', '-', '-', '-', '--', '--']
 
 # Change here if you want to use top K or all features.
 # top_k = 2000
-top_k = None 
+top_k = 2000 
 
 
 # In[6]:
@@ -65,6 +67,7 @@ n_v = 56
 
 
 dataset_path = 'hpatches-sequences-release'
+output_path = 'pspnet_res50_cityscape'
 
 
 # In[8]:
@@ -91,8 +94,8 @@ def mnn_matcher(descriptors_a, descriptors_b):
 # In[10]:
 
 
-def benchmark_features(read_feats):
-    seq_names = sorted(os.listdir(dataset_path))
+def benchmark_features(read_feats,dpath):
+    seq_names = sorted(os.listdir(dpath))
 
     n_feats = []
     n_matches = []
@@ -113,7 +116,7 @@ def benchmark_features(read_feats):
                 torch.from_numpy(descriptors_b).to(device=device)
             )
             
-            homography = np.loadtxt(os.path.join(dataset_path, seq_name, "H_1_" + str(im_idx)))
+            homography = np.loadtxt(os.path.join(dpath, seq_name, "H_1_" + str(im_idx)))
             
             pos_a = keypoints_a[matches[:, 0], : 2] 
             pos_a_h = np.concatenate([pos_a, np.ones([matches.shape[0], 1])], axis=1)
@@ -159,9 +162,9 @@ def summary(stats):
 # In[12]:
 
 
-def generate_read_function(method, extension='ppm'):
+def generate_read_function(method, extension='ppm',d_path=None):
     def read_function(seq_name, im_idx):
-        aux = np.load(os.path.join(dataset_path, seq_name, '%d.%s.%s' % (im_idx, extension, method)))
+        aux = np.load(os.path.join(d_path, seq_name, '%d.%s.%s' % (im_idx, extension, method)))
         if top_k is None:
             return aux['keypoints'], aux['descriptors']
         else:
@@ -213,17 +216,19 @@ for method in methods:
     output_file = os.path.join(cache_dir, method + '.npy')
     print(method)
     if method == 'hesaff':
-        read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(dataset_path, seq_name, '%d.ppm.hesaff' % im_idx), appendmat=False))
+        read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(output_path, seq_name, '%d.ppm.hesaff' % im_idx), appendmat=False))
+    elif method == 'pspnet_res50_cs':
+        read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(output_path, seq_name, '%d.ppm.d2-net' % im_idx), appendmat=False))
     else:
         if method == 'delf' or method == 'delf-new':
-            read_function = generate_read_function(method, extension='png')
+            read_function = generate_read_function(method, extension='png',d_patch=dataset_patch)
         else:
-            read_function = generate_read_function(method)
+            read_function = generate_read_function(method, d_patch=dataset_patch)
     if os.path.exists(output_file):
         print('Loading precomputed errors...')
         errors[method] = np.load(output_file, allow_pickle=True)
     else:
-        errors[method] = benchmark_features(read_function)
+        errors[method] = benchmark_features(read_function,output_path)
         np.save(output_file, errors[method])
     summary(errors[method][-1])
 
@@ -284,9 +289,9 @@ plt.grid()
 plt.tick_params(axis='both', which='major', labelsize=20)
 
 if top_k is None:
-    plt.savefig('hseq.pdf', bbox_inches='tight', dpi=300)
+    plt.savefig('test.pdf', bbox_inches='tight', dpi=300)
 else:
-    plt.savefig('hseq-top.pdf', bbox_inches='tight', dpi=300)
+    plt.savefig('test-top.pdf', bbox_inches='tight', dpi=300)
 
 
 # In[ ]:
