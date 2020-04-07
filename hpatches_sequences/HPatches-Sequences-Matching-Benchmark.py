@@ -162,7 +162,7 @@ def summary(stats):
 # In[12]:
 
 
-def generate_read_function(method, extension='ppm',d_path=None):
+def generate_read_function(method, extension='ppm', d_path=None):
     def read_function(seq_name, im_idx):
         aux = np.load(os.path.join(d_path, seq_name, '%d.%s.%s' % (im_idx, extension, method)))
         if top_k is None:
@@ -221,9 +221,9 @@ for method in methods:
         read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(output_path, seq_name, '%d.ppm.d2-net' % im_idx), appendmat=False))
     else:
         if method == 'delf' or method == 'delf-new':
-            read_function = generate_read_function(method, extension='png',d_patch=dataset_patch)
+            read_function = generate_read_function(method, extension='png',d_path=dataset_patch)
         else:
-            read_function = generate_read_function(method, d_patch=dataset_path)
+            read_function = generate_read_function(method, d_path=dataset_path)
     if os.path.exists(output_file):
         print('Loading precomputed errors...')
         errors[method] = np.load(output_file, allow_pickle=True)
