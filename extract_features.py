@@ -47,7 +47,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '--output_extension', type=str, default='.d2-net',
+    '--output_extension', type=str, default='.npz',
     help='extension for the output'
 )
 parser.add_argument(

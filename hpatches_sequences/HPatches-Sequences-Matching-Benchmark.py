@@ -219,7 +219,7 @@ for method in methods:
     if method == 'hesaff':
         read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(output_path, seq_name, '%d.ppm.hesaff' % im_idx), appendmat=False))
     elif method == 'pspnet_res50_cs':
-        read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(output_path, seq_name, '%d.ppm.d2-net' % im_idx), appendmat=False))
+        read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(output_path, seq_name, '%d.ppm.npz' % im_idx), appendmat=False))
     else:
         if method == 'delf' or method == 'delf-new':
             read_function = generate_read_function(method, extension='png',d_path=dataset_patch)
