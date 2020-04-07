@@ -94,8 +94,8 @@ def mnn_matcher(descriptors_a, descriptors_b):
 # In[10]:
 
 
-def benchmark_features(read_feats,dpath):
-    seq_names = sorted(os.listdir(dpath))
+def benchmark_features(read_feats,d_path=None):
+    seq_names = sorted(os.listdir(d_path))
 
     n_feats = []
     n_matches = []
@@ -116,7 +116,7 @@ def benchmark_features(read_feats,dpath):
                 torch.from_numpy(descriptors_b).to(device=device)
             )
             
-            homography = np.loadtxt(os.path.join(dpath, seq_name, "H_1_" + str(im_idx)))
+            homography = np.loadtxt(os.path.join(d_path, seq_name, "H_1_" + str(im_idx)))
             
             pos_a = keypoints_a[matches[:, 0], : 2] 
             pos_a_h = np.concatenate([pos_a, np.ones([matches.shape[0], 1])], axis=1)
@@ -214,6 +214,7 @@ errors = {}
 
 for method in methods:
     output_file = os.path.join(cache_dir, method + '.npy')
+    print(output_file)
     print(method)
     if method == 'hesaff':
         read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(output_path, seq_name, '%d.ppm.hesaff' % im_idx), appendmat=False))
@@ -228,7 +229,7 @@ for method in methods:
         print('Loading precomputed errors...')
         errors[method] = np.load(output_file, allow_pickle=True)
     else:
-        errors[method] = benchmark_features(read_function,output_path)
+        errors[method] = benchmark_features(read_function,d_path=output_path)
         np.save(output_file, errors[method])
     summary(errors[method][-1])
 
