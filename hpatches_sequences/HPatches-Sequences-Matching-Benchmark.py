@@ -53,7 +53,7 @@ linestyles = ['-', '-', '-', '--', '-']
 
 # Change here if you want to use top K or all features.
 # top_k = 2000
-top_k = 2000 
+top_k = None 
 
 
 # In[6]:
