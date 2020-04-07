@@ -106,7 +106,7 @@ class PSPNet(nn.Module):
     """Pyramid Scene Parsing Network"""
     # DEFAULTS ARE FOR CITYSCAPES
 
-    def __init__(self, use_cuda=True, n_classes=19, pyramids=[6, 3, 2, 1], input_size=[713, 713], 
+    def __init__(self, n_classes=19, pyramids=[6, 3, 2, 1], input_size=[713, 713], 
                  use_bn=True, output_features=False, output_all=False, 
                  model_type=None, truncated_blocks=2, dilation_blocks=1, d2netTest=True):
 
