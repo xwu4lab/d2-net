@@ -25,15 +25,12 @@ def process_multiscale(image, model, scales=[.5, 1, 2],scaling_steps=2):
             mode='bilinear', align_corners=True
         )
         _, _, h_level, w_level = current_image.size()
-
-        print(current_image.size())
+        
         dense_features = model.dense_feature_extraction(current_image)
         del current_image
 
         _, _, h, w = dense_features.size()
         
-        
-        print(dense_features.size())
         # Sum the feature maps.
         if previous_dense_features is not None:
             dense_features += F.interpolate(
@@ -120,7 +117,7 @@ def process_multiscale(image, model, scales=[.5, 1, 2],scaling_steps=2):
         previous_dense_features = dense_features
         del dense_features
     del previous_dense_features, banned
-    print(all_keypoints.size())
+
     keypoints = all_keypoints.t().numpy()
     del all_keypoints
     scores = all_scores.numpy()

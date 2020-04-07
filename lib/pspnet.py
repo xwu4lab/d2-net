@@ -37,8 +37,7 @@ class _DilatedFCN(nn.Module):
             ('conv3', _ConvBatchNormReLU(64, 128, 3, 1, 1, 1, use_bn=use_bn)),
             ('pool', nn.MaxPool2d(3, 2, 1))
         ]))
-        print(truncated_blocks)
-        print(dilation_blocks)
+        
         if truncated_blocks+dilation_blocks == 4:
             self.layer2 = _ResBlock(n_blocks[0], 128, 64, 256, 1, 1, use_bn=use_bn)
             self.layer3 = _ResBlock(n_blocks[1], 256, 128, 512, 1, 2, use_bn=use_bn)
