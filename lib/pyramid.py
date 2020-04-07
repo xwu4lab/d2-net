@@ -26,11 +26,14 @@ def process_multiscale(image, model, scales=[.5, 1, 2],scaling_steps=2):
         )
         _, _, h_level, w_level = current_image.size()
 
+        print(current_image.size())
         dense_features = model.dense_feature_extraction(current_image)
         del current_image
 
         _, _, h, w = dense_features.size()
-
+        
+        
+        print(dense_features.size())
         # Sum the feature maps.
         if previous_dense_features is not None:
             dense_features += F.interpolate(

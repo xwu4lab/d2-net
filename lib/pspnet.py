@@ -37,7 +37,8 @@ class _DilatedFCN(nn.Module):
             ('conv3', _ConvBatchNormReLU(64, 128, 3, 1, 1, 1, use_bn=use_bn)),
             ('pool', nn.MaxPool2d(3, 2, 1))
         ]))
-
+        print(truncated_blocks)
+        print(dilation_blocks)
         if truncated_blocks+dilation_blocks == 4:
             self.layer2 = _ResBlock(n_blocks[0], 128, 64, 256, 1, 1, use_bn=use_bn)
             self.layer3 = _ResBlock(n_blocks[1], 256, 128, 512, 1, 2, use_bn=use_bn)
@@ -118,7 +119,11 @@ class PSPNet(nn.Module):
         self.n_classes = n_classes
         self.output_features = output_features
         self.output_all = output_all
-        self.fcn = _DilatedFCN(use_bn=use_bn, model_type=model_type, truncated_blocks=2, dilation_blocks=1)
+        self.fcn = _DilatedFCN(
+            use_bn=use_bn, model_type=model_type,
+            truncated_blocks=truncated_blocks, 
+            dilation_blocks=dilation_blocks
+        )
         self.ppm = _PyramidPoolModule(
             in_channels=2048, pyramids=pyramids, use_bn=use_bn)
         self.final = nn.Sequential(OrderedDict([
