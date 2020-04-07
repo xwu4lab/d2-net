@@ -67,7 +67,7 @@ n_v = 56
 
 
 dataset_path = 'hpatches-sequences-release'
-output_path = 'pspnet_res50_cityscape'
+output_path = 'hpatches-sequences-release'
 
 
 # In[8]:
