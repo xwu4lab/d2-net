@@ -111,6 +111,8 @@ model = D2Net(
     pspnetTest=args.pspnetTest
 )
 
+print(model)
+
 if use_cuda:
     model = model.cuda()
 

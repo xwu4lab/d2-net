@@ -137,7 +137,7 @@ class D2Net(nn.Module):
                 use_bn=True, 
                 output_features=False, 
                 output_all=False, 
-                model_type=None, 
+                model_type=model_type, 
                 truncated_blocks=truncated_blocks, 
                 dilation_blocks=dilation_blocks, 
                 d2netTest=True
