@@ -40,8 +40,8 @@ device = torch.device('cuda:0' if use_cuda else 'cpu')
 # names = ['Hes. Aff. + Root-SIFT', 'HAN + HN++', 'DELF', 'DELF New', 'SuperPoint', 'D2-Net', 'D2-Net Trained']
 # colors = ['black', 'orange', 'red', 'red', 'blue', 'purple', 'purple']
 # linestyles = ['-', '-', '-', '--', '-', '-', '--']
-methods = ['d2-net', 'd2-net-ms', 'd2-net-trained', 'd2-net-trained-ms','pspnet_res50_cs']
-names = [ 'D2-Net', 'D2-Net MS', 'D2-Net Trained', 'D2-Net Trained MS', 'pspnet-res50-cs']
+methods = ['d2-net', 'd2-net-ms', 'd2-net-trained', 'd2-net-trained-ms','pspnet-res50-cs']
+names = [ 'D2-Net', 'D2-Net MS', 'D2-Net Trained', 'D2-Net Trained MS', 'pspnet res50 cs']
 colors = ['black', 'orange', 'red', 'red', 'blue']
 linestyles = ['-', '-', '-', '--', '-']
 #colors = ['black', 'orange', 'red', 'red', 'blue', 'brown', 'purple', 'green', 'purple', 'green']
@@ -218,8 +218,8 @@ for method in methods:
     print(method)
     if method == 'hesaff':
         read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(output_path, seq_name, '%d.ppm.hesaff' % im_idx), appendmat=False))
-    elif method == 'pspnet_res50_cs':
-        read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(output_path, seq_name, '%d.ppm.npz' % im_idx), appendmat=False))
+    elif method == 'pspnet-res50-cs':
+        read_function = lambda seq_name, im_idx: parse_mat(loadmat(os.path.join(output_path, seq_name, '%d.ppm.pspnet-res50-cs' % im_idx), appendmat=False))
     else:
         if method == 'delf' or method == 'delf-new':
             read_function = generate_read_function(method, extension='png',d_path=dataset_patch)

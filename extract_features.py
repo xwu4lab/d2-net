@@ -47,7 +47,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '--output_extension', type=str, default='.npz',
+    '--output_extension', type=str, default='.pspnet-res50-cs',
     help='extension for the output'
 )
 parser.add_argument(
