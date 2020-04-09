@@ -126,7 +126,7 @@ class DenseFeatureExtractionModule(nn.Module):
 
 
 class D2Net(nn.Module):
-    def __init__(self, model_file=None, use_relu=True, use_cuda=True, truncated_blocks=2, model_type=None, edge_threshold=5, dilation_blocks=1, pspnetTest=False):
+    def __init__(self, model_file=None, use_relu=True, use_cuda=True, truncated_blocks=2, model_type=None, edge_threshold=5, dilation_blocks=1, mode=1, pspnetTest=False):
         super(D2Net, self).__init__()
 
         if pspnetTest:
@@ -140,6 +140,7 @@ class D2Net(nn.Module):
                 model_type=model_type, 
                 truncated_blocks=truncated_blocks, 
                 dilation_blocks=dilation_blocks, 
+                mode=mode,
                 d2netTest=True
             )
         else:
