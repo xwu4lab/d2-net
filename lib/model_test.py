@@ -15,30 +15,39 @@ class DenseFeatureExtractionModule(nn.Module):
         self.model_type = model_type
 
         if model_type == 'vgg16':
+            model = models.vgg16(pretrained=True)
             self.model = nn.Sequential(
-                nn.Conv2d(3, 64, 3, padding=1),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(64, 64, 3, padding=1),
-                nn.ReLU(inplace=True),
-                nn.MaxPool2d(2, stride=2),
-                nn.Conv2d(64, 128, 3, padding=1),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(128, 128, 3, padding=1),
-                nn.ReLU(inplace=True),
-                nn.MaxPool2d(2, stride=2),
-                nn.Conv2d(128, 256, 3, padding=1),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(256, 256, 3, padding=1),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(256, 256, 3, padding=1),
-                nn.ReLU(inplace=True),
-                nn.AvgPool2d(2, stride=1),
-                nn.Conv2d(256, 512, 3, padding=2, dilation=2),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(512, 512, 3, padding=2, dilation=2),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(512, 512, 3, padding=2, dilation=2),
+                *list(model.features.children())[:22]
             )
+            self.model[16]=nn.AvgPool2d(kernel_size=(2, 2), stride=1)
+            self.model[17]=nn.Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(2, 2))
+            self.model[19]=nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(2, 2), padding=(2, 2))
+            self.model[21]=nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(2, 2), padding=(2, 2))
+
+            #self.model = nn.Sequential(
+            #    nn.Conv2d(3, 64, 3, padding=1),
+            #    nn.ReLU(inplace=True),
+            #    nn.Conv2d(64, 64, 3, padding=1),
+            #    nn.ReLU(inplace=True),
+            #    nn.MaxPool2d(2, stride=2),
+            #    nn.Conv2d(64, 128, 3, padding=1),
+            #    nn.ReLU(inplace=True),
+            #    nn.Conv2d(128, 128, 3, padding=1),
+            #    nn.ReLU(inplace=True),
+            #    nn.MaxPool2d(2, stride=2),
+            #    nn.Conv2d(128, 256, 3, padding=1),
+            #    nn.ReLU(inplace=True),
+            #    nn.Conv2d(256, 256, 3, padding=1),
+            #    nn.ReLU(inplace=True),
+            #    nn.Conv2d(256, 256, 3, padding=1),
+            #    nn.ReLU(inplace=True),
+            #    nn.AvgPool2d(2, stride=1),
+            #    nn.Conv2d(256, 512, 3, padding=2, dilation=2),
+            #    nn.ReLU(inplace=True),
+            #    nn.Conv2d(512, 512, 3, padding=2, dilation=2),
+            #    nn.ReLU(inplace=True),
+            #    nn.Conv2d(512, 512, 3, padding=2, dilation=2),
+            #)
             self.num_channels = 512
 
         elif model_type == 'res50':
@@ -162,9 +171,13 @@ class D2Net(nn.Module):
                     self.load_state_dict(torch.load(model_file, map_location='cpu')['state_dict'], strict=False)
             else:
                 if use_cuda:
-                    self.load_state_dict(torch.load(model_file)['model'])
+                    model = models.vgg16(pretrained=True)
+                    self.load_state_dict(model.state_dict(),strict=False)
+                    #self.load_state_dict(torch.load(model_file)['model'])
                 else:
-                    self.load_state_dict(torch.load(model_file, map_location='cpu')['model'])
+                    model = models.vgg16(pretrained=True)
+                    self.load_state_dict(model.state_dict(),strict=False)
+                    #self.load_state_dict(torch.load(model_file, map_location='cpu')['model'])
 
     def forward(self, batch):
         _, _, h, w = batch.size()
