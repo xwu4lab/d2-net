@@ -35,17 +35,13 @@ class _Bottleneck(nn.Sequential):
     """Bottleneck Unit"""
 
     def __init__(self, in_channels, mid_channels, out_channels,
-                 stride, dilation, downsample, use_bn=True, mode=1):
+                 stride, dilation, downsample, use_bn=True):
         super(_Bottleneck, self).__init__()
        
-        if mode:
-            self.reduce = _ConvBatchNormReLU(in_channels, mid_channels, 1, stride, 0, 1, use_relu=True, use_bn=use_bn)  # NOQA
-            self.conv3x3 = _ConvBatchNormReLU(mid_channels, mid_channels, 3, 1, dilation, dilation, use_relu=True, use_bn=use_bn)  # NOQA
-            self.increase = _ConvBatchNormReLU(mid_channels, out_channels, 1, 1, 0, 1, use_relu=False, use_bn=use_bn)  # NOQA
-        else:
-            self.reduce = _ConvBatchNormReLU(in_channels, mid_channels, 1, stride, 0, 1, use_relu=False, use_bn=use_bn)  # NOQA
-            self.conv3x3 = _ConvBatchNormReLU(mid_channels, mid_channels, 3, 1, dilation, dilation, use_relu=False, use_bn=use_bn)  # NOQA
-            self.increase = _ConvBatchNormReLU(mid_channels, out_channels, 1, 1, 0, 1, use_relu=True, use_bn=use_bn)  # NOQA    
+
+        self.reduce = _ConvBatchNormReLU(in_channels, mid_channels, 1, stride, 0, 1, use_relu=False, use_bn=use_bn)  # NOQA
+        self.conv3x3 = _ConvBatchNormReLU(mid_channels, mid_channels, 3, 1, dilation, dilation, use_relu=False, use_bn=use_bn)  # NOQA
+        self.increase = _ConvBatchNormReLU(mid_channels, out_channels, 1, 1, 0, 1, use_relu=True, use_bn=use_bn)  # NOQA    
         
         self.downsample = downsample
         if self.downsample:
@@ -66,11 +62,11 @@ class _ResBlock(nn.Sequential):
     """Residual Block"""
 
     def __init__(self, n_layers, in_channels, mid_channels,
-                 out_channels, stride, dilation, use_bn=True, mode=1):
+                 out_channels, stride, dilation, use_bn=True):
         super(_ResBlock, self).__init__()
-        self.add_module('block1', _Bottleneck(in_channels, mid_channels, out_channels, stride, dilation, True, use_bn=use_bn, mode=mode))  # NOQA
+        self.add_module('block1', _Bottleneck(in_channels, mid_channels, out_channels, stride, dilation, True, use_bn=use_bn))  # NOQA
         for i in range(2, n_layers + 1):
-            self.add_module('block' + str(i), _Bottleneck(out_channels, mid_channels, out_channels, 1, dilation, False, use_bn=use_bn, mode=mode))  # NOQA
+            self.add_module('block' + str(i), _Bottleneck(out_channels, mid_channels, out_channels, 1, dilation, False, use_bn=use_bn))  # NOQA
 
     def __call__(self, x):
         return super(_ResBlock, self).forward(x)

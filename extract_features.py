@@ -84,11 +84,7 @@ parser.add_argument(
     help='use dilation or not'
 )
 parser.add_argument(
-    '--mode', type=int, default=1,
-    help='use old or new resnet architecture. 1 is old and 0 is new'
-)
-parser.add_argument(
-    '--pspnetTest', type=bool, default=False,
+    '--pspnetTest', type=int, default=0,
     help='use PSPNet Model or not'
 )
 args = parser.parse_args()
@@ -112,7 +108,6 @@ model = D2Net(
     model_type=args.model_type,
     edge_threshold=args.edge_threshold,
     dilation_blocks=args.dilation_blocks,
-    mode=args.mode,
     pspnetTest=args.pspnetTest
 )
 

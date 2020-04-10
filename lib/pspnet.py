@@ -18,7 +18,7 @@ from lib.resnet import _ConvBatchNormReLU, _ResBlock
 class _DilatedFCN(nn.Module):
     """ResNet-based Dilated FCN"""
 
-    def __init__(self, use_bn=True, model_type=None, truncated_blocks=2, dilation_blocks=1, mode=1):
+    def __init__(self, use_bn=True, model_type=None, truncated_blocks=2, dilation_blocks=1):
         super(_DilatedFCN, self).__init__()
 
         self.truncated_blocks=truncated_blocks
@@ -38,25 +38,25 @@ class _DilatedFCN(nn.Module):
         ]))
         
         if truncated_blocks+dilation_blocks == 4:
-            self.layer2 = _ResBlock(n_blocks[0], 128, 64, 256, 1, 1, use_bn=use_bn, mode=mode)
-            self.layer3 = _ResBlock(n_blocks[1], 256, 128, 512, 1, 2, use_bn=use_bn, mode=mode)
-            self.layer4 = _ResBlock(n_blocks[2], 512, 256, 1024, 1, 4, use_bn=use_bn, mode=mode)
-            self.layer5 = _ResBlock(n_blocks[3], 1024, 512, 2048, 1, 8, use_bn=use_bn, mode=mode)
+            self.layer2 = _ResBlock(n_blocks[0], 128, 64, 256, 1, 1, use_bn=use_bn)
+            self.layer3 = _ResBlock(n_blocks[1], 256, 128, 512, 1, 2, use_bn=use_bn)
+            self.layer4 = _ResBlock(n_blocks[2], 512, 256, 1024, 1, 4, use_bn=use_bn)
+            self.layer5 = _ResBlock(n_blocks[3], 1024, 512, 2048, 1, 8, use_bn=use_bn)
         elif truncated_blocks+dilation_blocks == 3:
-            self.layer2 = _ResBlock(n_blocks[0], 128, 64, 256, 1, 1, use_bn=use_bn, mode=mode)
-            self.layer3 = _ResBlock(n_blocks[1], 256, 128, 512, 2, 1, use_bn=use_bn, mode=mode)
-            self.layer4 = _ResBlock(n_blocks[2], 512, 256, 1024, 1, 2, use_bn=use_bn, mode=mode)
-            self.layer5 = _ResBlock(n_blocks[3], 1024, 512, 2048, 1, 4, use_bn=use_bn, mode=mode)
+            self.layer2 = _ResBlock(n_blocks[0], 128, 64, 256, 1, 1, use_bn=use_bn)
+            self.layer3 = _ResBlock(n_blocks[1], 256, 128, 512, 2, 1, use_bn=use_bn)
+            self.layer4 = _ResBlock(n_blocks[2], 512, 256, 1024, 1, 2, use_bn=use_bn)
+            self.layer5 = _ResBlock(n_blocks[3], 1024, 512, 2048, 1, 4, use_bn=use_bn)
         elif truncated_blocks+dilation_blocks == 2:
-            self.layer2 = _ResBlock(n_blocks[0], 128, 64, 256, 1, 1, use_bn=use_bn, mode=mode)
-            self.layer3 = _ResBlock(n_blocks[1], 256, 128, 512, 2, 1, use_bn=use_bn, mode=mode)
-            self.layer4 = _ResBlock(n_blocks[2], 512, 256, 1024, 2, 1, use_bn=use_bn, mode=mode)
-            self.layer5 = _ResBlock(n_blocks[3], 1024, 512, 2048, 1, 2, use_bn=use_bn, mode=mode)
+            self.layer2 = _ResBlock(n_blocks[0], 128, 64, 256, 1, 1, use_bn=use_bn)
+            self.layer3 = _ResBlock(n_blocks[1], 256, 128, 512, 2, 1, use_bn=use_bn)
+            self.layer4 = _ResBlock(n_blocks[2], 512, 256, 1024, 2, 1, use_bn=use_bn)
+            self.layer5 = _ResBlock(n_blocks[3], 1024, 512, 2048, 1, 2, use_bn=use_bn)
         elif truncated_blocks+dilation_blocks == 1:
-            self.layer2 = _ResBlock(n_blocks[0], 128, 64, 256, 1, 1, use_bn=use_bn, mode=mode)
-            self.layer3 = _ResBlock(n_blocks[1], 256, 128, 512, 2, 1, use_bn=use_bn, mode=mode)
-            self.layer4 = _ResBlock(n_blocks[2], 512, 256, 1024, 2, 1, use_bn=use_bn, mode=mode)
-            self.layer5 = _ResBlock(n_blocks[3], 1024, 512, 2048, 2, 1, use_bn=use_bn, mode=mode)
+            self.layer2 = _ResBlock(n_blocks[0], 128, 64, 256, 1, 1, use_bn=use_bn)
+            self.layer3 = _ResBlock(n_blocks[1], 256, 128, 512, 2, 1, use_bn=use_bn)
+            self.layer4 = _ResBlock(n_blocks[2], 512, 256, 1024, 2, 1, use_bn=use_bn)
+            self.layer5 = _ResBlock(n_blocks[3], 1024, 512, 2048, 2, 1, use_bn=use_bn)
         else:
             print('You want too much')
         
@@ -119,8 +119,7 @@ class PSPNet(nn.Module):
         self.fcn = _DilatedFCN(
             use_bn=use_bn, model_type=model_type,
             truncated_blocks=truncated_blocks, 
-            dilation_blocks=dilation_blocks,
-            mode=mode
+            dilation_blocks=dilation_blocks
         )
         self.ppm = _PyramidPoolModule(
             in_channels=2048, pyramids=pyramids, use_bn=use_bn)
