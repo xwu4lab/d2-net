@@ -52,7 +52,7 @@ class DenseFeatureExtractionModule(nn.Module):
 
         elif model_type == 'res50':
             model = models.resnet50(pretrained=True)
-            self.model = nn.Sequential(
+            self.model = nn.Sequential(features.
                 *list(model.children())[: -truncated_blocks-1]
             )
 
@@ -172,11 +172,11 @@ class D2Net(nn.Module):
             else:
                 if use_cuda:
                     model = models.vgg16(pretrained=True)
-                    self.load_state_dict(model.state_dict(),strict=False)
+                    self.load_state_dict(model.features[:22].state_dict(),strict=False)
                     #self.load_state_dict(torch.load(model_file)['model'])
                 else:
                     model = models.vgg16(pretrained=True)
-                    self.load_state_dict(model.state_dict(),strict=False)
+                    self.load_state_dict(model.features[:22].state_dict(),strict=False)
                     #self.load_state_dict(torch.load(model_file, map_location='cpu')['model'])
 
     def forward(self, batch):
