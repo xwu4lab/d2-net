@@ -20,9 +20,9 @@ class DenseFeatureExtractionModule(nn.Module):
                 *list(model.features.children())[:22]
             )
             self.model[16]=nn.AvgPool2d(kernel_size=(2, 2), stride=1)
-            self.model[17]=nn.Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(2, 2))
-            self.model[19]=nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(2, 2), padding=(2, 2))
-            self.model[21]=nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(2, 2), padding=(2, 2))
+            self.model[17]=nn.Conv2d(256, 512, kernel_size=(3, 3), padding=(2, 2), dilation=(2, 2))
+            self.model[19]=nn.Conv2d(512, 512, kernel_size=(3, 3), padding=(2, 2), dilation=(2, 2))
+            self.model[21]=nn.Conv2d(512, 512, kernel_size=(3, 3), padding=(2, 2), dilation=(2, 2))
 
             #self.model = nn.Sequential(
             #    nn.Conv2d(3, 64, 3, padding=1),
@@ -181,7 +181,7 @@ class D2Net(nn.Module):
             else:
                 model = models.vgg16(pretrained=True)
                 self.load_state_dict(model.features[:22].state_dict(), strict=False)
-                
+
     def forward(self, batch):
         _, _, h, w = batch.size()
         dense_features = self.dense_feature_extraction(batch)

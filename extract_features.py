@@ -112,6 +112,7 @@ model = D2Net(
 )
 
 print(model)
+print(model.state_dict())
 
 if use_cuda:
     model = model.cuda()
