@@ -174,16 +174,17 @@ class D2Net(nn.Module):
                     self.load_state_dict(torch.load(model_file)['model'])
                 else:
                     self.load_state_dict(torch.load(model_file, map_location='cpu')['model'])
-        else:
-            if use_cuda:
-                model = models.vgg16(pretrained=True)
-                self.load_state_dict(model.features[:22].state_dict(), strict=False)
-            else:
-                model = models.vgg16(pretrained=True)
-                self.load_state_dict(model.features[:22].state_dict(), strict=False)
+        #else:
+        #    if use_cuda:
+        #        model = models.vgg16(pretrained=True)
+        #        self.load_state_dict(model.features[:22].state_dict(), strict=False)
+        #    else:
+        #        model = models.vgg16(pretrained=True)
+        #        self.load_state_dict(model.features[:22].state_dict(), strict=False)
 
     def forward(self, batch):
         _, _, h, w = batch.size()
+        
         dense_features = self.dense_feature_extraction(batch)
 
         detections = self.detection(dense_features)
@@ -215,6 +216,7 @@ class HardDetectionModule(nn.Module):
 
     def forward(self, batch):
         b, c, h, w = batch.size()
+        
         device = batch.device
 
         depth_wise_max = torch.max(batch, dim=1)[0]
